@@ -4,9 +4,9 @@ import axios from "axios";
 import { useCookies } from "react-cookie";
 
 const TestComponent = () => {
-    const [testData, setTestData] = useState(0);
+    const [testData, setTestData] = useState<number>(0);
 
-  const handleSubmit = async (event) => {
+  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     try {
       // sends post-request to test endpint to our backend, (not sending any data with the request to backend for now)
@@ -15,7 +15,11 @@ const TestComponent = () => {
       setTestData(result.data.test_data); // access teh data that we recived in the response
       
     } catch (error) {
-      console.error(error.response.data.message);  
+      if (axios.isAxiosError(error) && error.response) {
+        console.error(error.response.data.message);
+      } else {
+        console.error("An unknown error occurred");
+      }
     }
   };
 
