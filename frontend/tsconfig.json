@@ -15,7 +15,7 @@
     "allowSyntheticDefaultImports": true,
     "esModuleInterop": true,
     "target": "es5",
-    "types": ["jest", "@types/web-vitals"]
+    "types": ["jest"]
   },
   "include": ["src"]
 }
