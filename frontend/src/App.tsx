@@ -1,11 +1,9 @@
-import HomePage from './pages/HomePage';
-import LoginForm from './pages/LoginForm';
-
+import HomePage from "./pages/HomePage";
 
 function App() {
   return (
     <div>
-      <LoginForm />
+      <HomePage />
     </div>
   );
 }
