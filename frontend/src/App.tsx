@@ -1,9 +1,9 @@
-import HomePage from "./pages/HomePage";
+import DashboardLayout from "./components/DashboardLayout";
 
 function App() {
   return (
     <div>
-      <HomePage />
+      <DashboardLayout />
     </div>
   );
 }
