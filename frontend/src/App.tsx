@@ -1,11 +1,17 @@
-import DashboardLayout from "./components/DashboardLayout";
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import DashboardLayoutBasic from "./components/DashboardLayout";
+import DashboardPage from "./pages/DashboardPage";
+import AboutPage from "./pages/AboutPage";
 
-function App() {
+export default function App() {
   return (
-    <div>
-      <DashboardLayout />
-    </div>
+    <Router>
+      <Routes>
+        <Route path="/" element={<DashboardLayoutBasic />}>
+          <Route path="/dashboard" element={<DashboardPage />} />
+          <Route path="/about" element={<AboutPage />} />
+        </Route>
+      </Routes>
+    </Router>
   );
 }
-
-export default App;
