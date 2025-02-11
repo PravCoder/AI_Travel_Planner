@@ -11,7 +11,7 @@ cd into frontend & run:
 npm start
 ```
 Frontend runs on port 3000. http://localhost:3000/
-App.jsx is where we load in the page.jsx's stuff. It is also where we have differnet routes/urls to different pages. 
+App.tsx is where we load in the page.tsx's stuff. It is also where we have differnet routes/urls to different pages. 
 
 **To run backend**:
 cd into backend & run:
@@ -19,7 +19,7 @@ cd into backend & run:
 npm start
 ```
 Backend runs on port 3001. 
-src/index.js is where we connect to database and start express server. It is also where we handle requests from the frontend, this is where we handle our app api endpoints. We have to create more files to api endpoints but for now we can handle them in index.js
+src/index.ts is where we connect to database and start express server. It is also where we handle requests from the frontend, this is where we handle our app api endpoints. We have to create more files to api endpoints but for now we can handle them in index.ts
 
 ### Common Errors & Cautions
 Have to install npm & node.js by going to their website. 

@@ -1,0 +1,1 @@
+/*  Define the Trip class model here. */
