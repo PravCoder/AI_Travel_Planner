@@ -17,9 +17,13 @@ const cors_1 = __importDefault(require("cors"));
 const express_1 = __importDefault(require("express"));
 const mongoose_1 = __importDefault(require("mongoose"));
 const app = (0, express_1.default)();
-const router = express_1.default.Router();
+const router = express_1.default.Router(); // base-router
 app.use(express_1.default.json());
 app.use((0, cors_1.default)());
+// Import routers
+const user_routes_1 = __importDefault(require("./routes/user_routes")); // impor user-router
+app.use("/", router);
+app.use("/user", user_routes_1.default); // include user-router routes all user-router-routes ahve prefix /user
 // connection string with db-password db-name, password is leaked here, also manually have to put db-name here after .net/
 mongoose_1.default
     .connect('mongodb+srv://admin:djbeg123*@aitravelplannercluster.96bpw.mongodb.net/?retryWrites=true&w=majority&appName=aitravelplannercluster')
