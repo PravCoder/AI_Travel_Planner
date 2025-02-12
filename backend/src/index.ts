@@ -1,19 +1,26 @@
+// currently  not used, index.js includes all routers
 import cors from 'cors';
 import express, { Request, Response } from 'express';
 import mongoose from 'mongoose';
 
 const app = express();
-const router = express.Router();
+const router = express.Router();  // base-router
 app.use(express.json());
 app.use(cors());
-app.use('/', router);
+
+// Import routers
+import userRouter from "./routes/user_routes";  // impor user-router
+app.use("/", router);
+app.use("/user", userRouter); // include user-router routes all user-router-routes ahve prefix /user
+
+
 
 // connection string with db-password db-name, password is leaked here, also manually have to put db-name here after .net/
 mongoose
   .connect(
     'mongodb+srv://admin:djbeg123*@aitravelplannercluster.96bpw.mongodb.net/?retryWrites=true&w=majority&appName=aitravelplannercluster'
   )
-  .then(() => console.log('Connected to MongoDB'))
+  .then(() => console.log('Connected to MongoDB index.ts: '))
   .catch((err: Error) => console.log('Error connecting to MongoDB:', err));
 
 // confirm server is running

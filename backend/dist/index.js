@@ -12,19 +12,18 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+// currently  not used, index.js includes all routers
 const cors_1 = __importDefault(require("cors"));
 const express_1 = __importDefault(require("express"));
 const mongoose_1 = __importDefault(require("mongoose"));
-// import axios from 'axios';
 const app = (0, express_1.default)();
 const router = express_1.default.Router();
 app.use(express_1.default.json());
 app.use((0, cors_1.default)());
-app.use('/', router);
 // connection string with db-password db-name, password is leaked here, also manually have to put db-name here after .net/
 mongoose_1.default
     .connect('mongodb+srv://admin:djbeg123*@aitravelplannercluster.96bpw.mongodb.net/?retryWrites=true&w=majority&appName=aitravelplannercluster')
-    .then(() => console.log('Connected to MongoDB'))
+    .then(() => console.log('Connected to MongoDB index.ts: '))
     .catch((err) => console.log('Error connecting to MongoDB:', err));
 // confirm server is running
 app.listen(3001, () => {
