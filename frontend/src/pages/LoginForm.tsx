@@ -18,18 +18,19 @@ const GlobalStyles = createGlobalStyle`
 
 
 const FormContainer = styled.div`
-  width: 100%
-  max-width: 700px;
+  width: 100%;
+  max-width: 400px;
   display: flex;
+  flex-direction: column;
+  justify-content: center;
   background-color: rgb(59,59,59);
   padding: 20px;
   border-radius: 12px;
   box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+  align-items: center;
 `;
 
 const Wrapper = styled.div`
-  margin: 0;
-  padding: 0;
   display: flex;
   justify-content: center;
   background-color: darkgray;
@@ -44,19 +45,18 @@ const H1 = styled.h1`
 
 const InputWrapper = styled.div`
   position: relative;
-  width: 100%;
-  max-width: 300px; 
+  width: 100%; 
 `
 
 const Input = styled.input`
-  padding: 10px 25px 10px 25px;
-  width: 100%;
+  padding: 10px 25px 10px 30px;
+  width: 350px;
   height: 40px;
-  margin: 00px 0;
+  margin: 2px;
   border: 2px solid #cc;
   outline: none;
   border-radius: 10px;  
-  font-size: 14px;
+  font-size: 16px;
   background: rgb(99,99,99);
   
   &:focus {
@@ -79,18 +79,50 @@ const ToggleButton = styled.button`
   cursor: pointer;
 `;
 
-const Button = styled.button`
+const SubmitButton = styled.button`
+  width: 100%;
+  height: 60px;
+  background:#4A90E2;
+  border: none;
+  border-radius: 20px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, .1);
+  cursor: pointer;
+  font-size: 16px;
+  font-weight: 600;
+  margin: 3px 3px 10px 3px;
 
-
-`
-const SvgIcon = styled(LockIcon)`
+  &: hover{
+    border: 2px solid #4A90E2;
+    box-shadow: 0 0 5px rgba(74, 144, 226, 0.5);
+  }
+`;
+const SvgLockIcon = styled(LockIcon)`
   position: absolute;
   left: 10px; /* Place it on the left inside the input */
   top: 50%;
   transform: translateY(-50%);
-  fill: #555;   /* Set color of the icon */
 `;
+const SvgUserIcon = styled(UserIcon)`
+  position: absolute;
+  left: 10px; /* Place it on the left inside the input */
+  top: 50%;
+  transform: translateY(-50%);
+`;
+const RememberMe = styled.div`
+  display: flex;
+  justify-content: space-between;
+  font-size: 15px;
+  margin: 15px 0 15px;
+  color: darkgray;
+`;
+const ForgotLink = styled.a`
+  color: darkgray;
+  text-decoration: none;
 
+  &:hover {
+    text-decoration: underline;
+  }
+`
 const LoginForm = () => {
   
   // This handles getting the values from the textboxes
@@ -119,12 +151,12 @@ const LoginForm = () => {
     <GlobalStyles/>
     <Wrapper>
       <FormContainer>
-    <div className="flex items-center justify-center min-h-screen bg-gray-100">
+    <div>
       <form onSubmit={handleSubmit}>
         <H1>Login</H1>
         {/* Username Textbox */}
-        <div>
-          <UserIcon />
+        <InputWrapper>
+          <SvgUserIcon />
           <Input
             type="text"
             value={userName}
@@ -132,10 +164,10 @@ const LoginForm = () => {
             placeholder="Username"
             required
           ></Input>
-        </div>
+        </InputWrapper>
         {/* Password Textbox */}
         <InputWrapper>
-          <SvgIcon />
+          <SvgLockIcon />
           <Input
             type={passwordVisible ? "text" : "password"}
             value={passWord}
@@ -148,19 +180,19 @@ const LoginForm = () => {
           </ToggleButton>
         </InputWrapper>
         {/* Remember me? checkbox */}
-        <div>
+        <RememberMe>
           <label>
             <input type="checkbox" /> Remember me
           </label>
-          <a href="#"> Forgot Password?</a>
-        </div>
+          <ForgotLink href="#"> Forgot Password?</ForgotLink>
+        </RememberMe>
         {/* Log in Button */}
         <div>
-          <button type="submit"> Login </button>
+          <SubmitButton type="submit"> Login </SubmitButton>
         </div>
         {/* Register Link */}
         <div>
-          <a href="#">New? Sign up and start traveling!</a>
+          <ForgotLink href="#">New? Sign up and start traveling!</ForgotLink>
         </div>
       </form>
     </div>
