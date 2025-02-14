@@ -49,7 +49,7 @@ OR
 git checkout -b bugfix/<bugfix-name>
 ```
 
-When contributing to a branch, make sure that any installed packages are documented in this README.md file or added to package.json. This will ensure that no other contributors are missing necessary packages.
+When contributing to a branch, make sure that any installed packages are documented in this README.md file or added to package.json. This will ensure that no other contributors are missing necessary packages.  return
 **"Dependencies"** are required for an app to run, and should be installed like this:
 ```
 npm install --save-prod <package_name>
