@@ -61,3 +61,6 @@ npm install --save-dev <package_name>
 Once the packages have been added to package.json, other contributors can install them automatically by running **npm install**
 
 Once a branch is ready to be implemented, submit a pull request with a detailed description of the feature or bugfix. Once the pull request has been created, the team can review and approve/deny it.
+
+**Side note for contribution:**
+Comment as much as possible. We all work collaboratively on this project, so it is important that everyone can read and understand one another's code.
