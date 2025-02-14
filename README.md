@@ -40,11 +40,11 @@ src/index.ts is where we connect to database and start express server. It is als
 ### Contribution
 Our branching strategy is based on features and bugfixes. We want to keep things as separate as possible so that we can see clearly what is being worked on, and to ensure that there are minimal problems (for example, merge conflicts) in the process of creating our travel planner.
 
-**To create a feature or bugfix branch:**
+**To create a feature branch:**
 ```
 git checkout -b feature/<feature-name>
 ```
-OR
+**To create a bugfix branch:**
 ```
 git checkout -b bugfix/<bugfix-name>
 ```
