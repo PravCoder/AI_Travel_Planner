@@ -5,7 +5,9 @@ Example of how project will be structured: https://github.com/machadop1407/MERN-
 
 ### Project Overview
 Our AI Travel Planner is an app that uses AI to generate trip ideas and travel itineraries for users. When given a destination or trip idea (ex: "I want a beach retreat."), the travel planner generates an itinerary, recommends food spots, hotels, popular attractions, offers cultural insights, etc. The app should be customizable for those with different budgets, trip lengths, preferred activities, etc.<br/>
+<br/>
 We found that this app could be useful for those who need help planning a vacation quickly, for those who find the process of planning a trip manually tiresome and difficult, or for travel companies/agents selling trips to customers.<br/>
+<br/>
 The AI Travel Planner can cut down on time spent planning, and remove the stress of the meticulous planning process. Many current travel planning aids do not offer the luxuries of adjusting recommendations/itineraries based on budget sizes, trip lengths, and preferred activities. In addition, we would like to assist users in their preparation for these trips, recommending auxiliary items, clothing, documents, and necessary vaccinations (based on the trip destination).
 
 ### Installation
