@@ -3,14 +3,14 @@
 Video for project setup: https://www.youtube.com/watch?v=P43DW3HUUH8&t=2293s
 Example of how project will be structured: https://github.com/machadop1407/MERN-Recipe-App
 
-### Project Overview
+## Project Overview
 Our AI Travel Planner is an app that uses AI to generate trip ideas and travel itineraries for users. When given a destination or trip idea (ex: "I want a beach retreat."), the travel planner generates an itinerary, recommends food spots, hotels, popular attractions, offers cultural insights, etc. The app should be customizable for those with different budgets, trip lengths, preferred activities, etc.<br/>
 <br/>
 We found that this app could be useful for those who need help planning a vacation quickly, for those who find the process of planning a trip manually tiresome and difficult, or for travel companies/agents selling trips to customers.<br/>
 <br/>
 The AI Travel Planner can cut down on time spent planning, and remove the stress of the meticulous planning process. Many current travel planning aids do not offer the luxuries of adjusting recommendations/itineraries based on budget sizes, trip lengths, and preferred activities. In addition, we would like to assist users in their preparation for these trips, recommending auxiliary items, clothing, documents, and necessary vaccinations (based on the trip destination).
 
-### Installation
+## Installation
 Have to install npm & node.js by going to their website. (node v22.13.1)
 
 To install all dependencies in package.json:
@@ -22,7 +22,7 @@ To install a package:
 npm add <package_name>
 ```
 
-### How to run
+## How to run
 **To run frontend**:
 cd into frontend & run:
 ```
@@ -39,7 +39,7 @@ npm start
 Backend runs on port 3001. 
 src/index.ts is where we connect to database and start express server. It is also where we handle requests from the frontend, this is where we handle our app api endpoints. We have to create more files to api endpoints but for now we can handle them in index.ts
 
-### Contribution
+## Contribution
 Our branching strategy is based on features and bugfixes. We want to keep things as separate as possible so that we can see clearly what is being worked on, and to ensure that there are minimal problems (for example, merge conflicts) in the process of creating our travel planner.  return
 
 **To create a feature or bugfix branch:**
