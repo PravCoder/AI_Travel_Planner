@@ -10,7 +10,7 @@ app.use(cors());
 
 // Import routers
 import userRouter from "./routes/user_routes";  // impor user-router
-app.use("/", router);
+app.use("/", userRouter);
 app.use("/user", userRouter); // include user-router routes all user-router-routes ahve prefix /user
 
 

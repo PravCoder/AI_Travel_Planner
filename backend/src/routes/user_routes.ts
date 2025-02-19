@@ -25,7 +25,7 @@ const userRouter = express.Router(); // create a express-router-instance
 interface RegisterRequestBody {username: string; password: string}
 interface LoginRequestBody {username: string; password: string}
 
-//TEST TEST TEST TEST TEST
+//TEST TEST TEST TEST
 interface TestRequestBody {form_input1: string; form_input2: string};
 userRouter.post("/test", async (req: Request<{}, {}, TestRequestBody>, res: Response) => {  // this accepts a post-request to /test endpoint and does some logic
 
