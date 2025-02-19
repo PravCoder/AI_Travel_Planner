@@ -1,4 +1,4 @@
-/*  Define the User class model here. */
+/*  User Class Model */
 import mongoose from 'mongoose';
 
 const userSchema = new mongoose.Schema({
