@@ -4,11 +4,14 @@
 2. In index.js import this userRouter and do app.use("/", userRouter);, so you can send requests to the endpoints in this file and test your code.
 */
 
-import express, { Request, Response } from "express";
+import express, { Request, Response, Router } from "express";
+import { hashPassword, verifyPassword } from '../Functions/Password';
+import UserModel from '../models/User';
 import mongoose from "mongoose";
 import cors from "cors";
 
-const userRouter = express.Router(); // create a express-router-instance
+const userRouter: Router = express.Router();
+ // create a express-router-instance
 
 
 
@@ -33,6 +36,37 @@ userRouter.post("/test", async (req: Request<{}, {}, TestRequestBody>, res: Resp
 
     res.status(201).json({message: "test endpoint was successful", additional_data: random_number}); // send response back to client with a message or additional data
 
+});
+
+
+
+/**
+ * Register Route
+ */
+interface RegisterRequestBody { userName: string; email: string; passWord: string };
+
+userRouter.post("/register", async (req: Request<{}, {}, RegisterRequestBody>, res: Response) => {
+  try {
+      const { userName, email, passWord } = req.body;
+
+      // Check if the user already exists
+      const existingUser = await UserModel.findOne({ email });
+      if (existingUser) {
+        return res.status(400).json({ error: "User already exists" });
+      }
+
+      // Hash the password
+      const hashedPassword = await hashPassword(passWord);
+
+      // Create a new user
+      const newUser = new UserModel({ userName, email, passWord: hashedPassword });
+      await newUser.save();
+
+      return res.status(201).json({ message: "User registered successfully!" });
+  } catch (error) {
+      console.error("Error in register route:", error);
+      return res.status(500).json({ error: "Error registering user" });
+  }
 });
 
 export default userRouter;

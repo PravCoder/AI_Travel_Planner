@@ -66,31 +66,32 @@
 
 import * as bcrypt from 'bcrypt';
 
-const SALT_ROUNDS = 10; // The number of times to salt the password
-async function hashPassword(password: string): Promise<string> {
-    const salt = await bcrypt.genSalt(SALT_ROUNDS); // generate a salt key
-    const hashedPassword = await bcrypt.hash(password, salt); // hash the password with the salt key
+const SALT_ROUNDS = 10;
 
-    console.log(`Hashed password: ${hashedPassword}`); // DEBUG: display the password
+/**
+ * Hashes a password using bcrypt with a generated salt.
+ * @param password - The password to hash
+ * @returns A promise that resolves to the hashed password
+ */
+export async function hashPassword(password: string): Promise<string> {
+    const salt = await bcrypt.genSalt(SALT_ROUNDS);
+    const hashedPassword = await bcrypt.hash(password, salt);
+    
+    console.log(`Hashed password: ${hashedPassword}`); // DEBUG
 
-    return hashedPassword; // kick the password back
-
+    return hashedPassword;
 }
 
-async function verifyPassword(password: string, hashedPassword: string): Promise<boolean> {
-    const isMatch = await bcrypt.compare(password, hashedPassword); // compare the password to the hashed password
+/**
+ * Verifies a password against a hashed password.
+ * @param password - The plaintext password
+ * @param hashedPassword - The hashed password to compare against
+ * @returns A promise that resolves to a boolean indicating if the passwords match
+ */
+export async function verifyPassword(password: string, hashedPassword: string): Promise<boolean> {
+    const isMatch = await bcrypt.compare(password, hashedPassword);
 
-    console.log(`Password match: ${isMatch}`); // DEBUG: display the result
+    console.log(`Password match: ${isMatch}`); // DEBUG
 
-    return isMatch; // return the result
+    return isMatch;
 }
-
-// Example usage:
-(async () => {
-    const password = 'password123';
-    const hashedPassword = await hashPassword(password); // hash the password
-
-    // sim a log in check
-    const isPasswordAMatch = await verifyPassword('password123', hashedPassword); // check the password
-    console.log(`Password verification result:', ${isPasswordAMatch}`); // DEBUG: display the result
-})();
