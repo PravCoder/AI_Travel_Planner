@@ -13,6 +13,16 @@ interface RegisterRequestBody {
   password: string;
 }
 
+/*
+* POST MEN REQUEST URL: http://localhost:3001/user/register
+* JSON BODY: 
+* {
+*  "username": "testUser",
+*  "email": "test@example.com",
+*  "password": "SecurePass123"
+* }
+*/
+
 userRouter.post("/register", async (req: Request<{}, {}, RegisterRequestBody>, res: Response) => {
   try {
     const { username, email, password } = req.body;
