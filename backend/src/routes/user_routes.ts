@@ -22,8 +22,9 @@ import User from '../models/User';
 const userRouter = express.Router(); // create a express-router-instance
 
 // Define interfaces 
-interface RegisterRequestBody {username: string; password: string}
-interface LoginRequestBody {username: string; password: string}
+interface RegisterRequestBody {username: string; email: string; password: string}
+interface LoginRequestBody {username: string;  email: string; password: string}
+
 
 //TEST TEST TEST TEST
 interface TestRequestBody {form_input1: string; form_input2: string};
@@ -41,18 +42,18 @@ userRouter.post("/test", async (req: Request<{}, {}, TestRequestBody>, res: Resp
 
 // User /register endpoint
 userRouter.post('/register', async (req: Request<{}, {}, RegisterRequestBody>, res: Response) => {
-    const { username, password } = req.body;
+    const { username, email, password } = req.body;
 
     try {
         // Check to see if user already exists
-        const userExists = await User.findOne({ username });
+        const userExists = await User.findOne({ email });
         if (userExists) {
             res.status(400).json({ message: 'User already exists' });
             return;
         }
 
         // Create a new user
-        const newUser = new User({ username, password });
+        const newUser = new User({ username, email, password });
 
         res.status(201).json({ message: 'User registered successfully', user: newUser });
     } catch (error) {
@@ -62,11 +63,11 @@ userRouter.post('/register', async (req: Request<{}, {}, RegisterRequestBody>, r
 
 // User /login endpoint
 userRouter.post('/login', async (req: Request<{}, {}, LoginRequestBody>, res: Response) => {
-    const { username, password } = req.body;
+    const { username, email, password } = req.body;
 
     try {
         // Find the user
-        const user = await User.findOne({ username, password });
+        const user = await User.findOne({ email, password });
         if (!user) {
             res.status(401).json({ message: 'Invalid username or password' });
             return;
