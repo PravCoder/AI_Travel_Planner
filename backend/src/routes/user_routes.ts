@@ -15,50 +15,44 @@ Postman-request-body:
 */
 
 import express, { Request, Response } from "express";
-import mongoose from "mongoose";
-import cors from "cors";
-import User from '../models/User';
+import { hashPassword } from "../Functions/Password"; // Ensure correct folder casing
+import UserModel from "../models/User"; // Ensure correct model import
 
-const userRouter = express.Router(); // create a express-router-instance
+const userRouter = express.Router(); // ✅ No need to declare as `Router`
+interface RegisterRequestBody {
+  username: string;
+  email: string;
+  password: string;
+}
 
-// Define interfaces 
-interface RegisterRequestBody {username: string; email: string; password: string}
-interface LoginRequestBody {username: string;  email: string; password: string}
+interface LoginRequestBody {
+  username: string;
+  email: string;
+  password: string;
+}
 
-
-//TEST TEST TEST TEST
-interface TestRequestBody {form_input1: string; form_input2: string};
-userRouter.post("/test", async (req: Request<{}, {}, TestRequestBody>, res: Response) => {  // this accepts a post-request to /test endpoint and does some logic
-
-    const {form_input1, form_input2} = req.body;  // breakdown inputs we recived with the request body
-
-    // do your endpoint logic here
-    console.log("Test Endpoint Data we recvied from frontend form: " + form_input1 + ", " +form_input2);
-    const random_number = Math.random(); // just get a random number and send it back to frontend in the response-json-body
-
-    res.status(201).json({message: "test endpoint was successful", additional_data: random_number}); // send response back to client with a message or additional data
-
-});
-
-// User /register endpoint
-userRouter.post('/register', async (req: Request<{}, {}, RegisterRequestBody>, res: Response) => {
+userRouter.post("/register", async (req: Request<{}, {}, RegisterRequestBody>, res: Response) => {
+  try {
     const { username, email, password } = req.body;
 
-    try {
-        // Check to see if user already exists
-        const userExists = await User.findOne({ email });
-        if (userExists) {
-            res.status(400).json({ message: 'User already exists' });
-            return;
-        }
-
-        // Create a new user
-        const newUser = new User({ username, email, password });
-
-        res.status(201).json({ message: 'User registered successfully', user: newUser });
-    } catch (error) {
-        res.status(500).json({ message: 'An error occurred', error });
+    // Check if user exists
+    const existingUser = await UserModel.findOne({ email });
+    if (existingUser) {
+      return res.status(400).json({ error: "User already exists" });
     }
+
+    // Hash the password
+    const hashedPassword = await hashPassword(password);
+
+    // Create and save new user
+    const newUser = new UserModel({ username, email, password: hashedPassword });
+    await newUser.save();
+
+    return res.status(201).json({ message: "User registered successfully!" });
+  } catch (error) {
+      console.error("Error in register route:", error);
+      return res.status(500).json({ error: "Error registering user" });
+  }
 });
 
 // User /login endpoint
@@ -67,7 +61,7 @@ userRouter.post('/login', async (req: Request<{}, {}, LoginRequestBody>, res: Re
 
     try {
         // Find the user
-        const user = await User.findOne({ email, password });
+        const user = await UserModel.findOne({ email, password });
         if (!user) {
             res.status(401).json({ message: 'Invalid username or password' });
             return;
