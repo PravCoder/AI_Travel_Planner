@@ -11,7 +11,8 @@ import { QuestionMark } from "@mui/icons-material";
 import { Outlet, useNavigate } from "react-router-dom";
 
 interface DashboardLayoutProps {
-  initialPath?: string;
+  initialPath?: string; // Make it optional since we have a default value
+  children?: React.ReactNode; // Add children prop
 }
 
 const NAVIGATION: Navigation = [
