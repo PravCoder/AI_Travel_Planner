@@ -103,6 +103,16 @@ export default function DashboardLayoutBasic({
 
   return (
     <AppProvider
+      branding={{
+        logo: (
+          <img
+            src={require("../assets/travel-planner-ai-gen-logo.jpg")}
+            alt="AI Travel Planner Logo"
+          />
+        ),
+        title: "AI Travel Planner",
+        homeUrl: "/dashboard",
+      }}
       navigation={NAVIGATION.map((item) =>
         "segment" in item && item.segment // Only add onClick if segment exists
           ? {
