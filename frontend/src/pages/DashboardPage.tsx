@@ -99,7 +99,7 @@ export default function Dashboard() {
         <Typography variant="h4" component="h1">
           My Trips
         </Typography>
-        <Box>
+        <Box sx={{ display: "flex", alignItems: "center" }}>
           <ButtonGroup sx={{ mr: 2 }}>
             <Button
               variant={viewMode === "grid" ? "contained" : "outlined"}
