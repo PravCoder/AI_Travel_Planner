@@ -1,134 +1,53 @@
-import * as React from "react";
-import { extendTheme, styled } from "@mui/material/styles";
-import DashboardIcon from "@mui/icons-material/Dashboard";
-import BarChartIcon from "@mui/icons-material/BarChart";
-import DescriptionIcon from "@mui/icons-material/Description";
-import LayersIcon from "@mui/icons-material/Layers";
-import { AppProvider, Navigation, Router } from "@toolpad/core/AppProvider";
-import { DashboardLayout } from "@toolpad/core/DashboardLayout";
-import { PageContainer } from "@toolpad/core/PageContainer";
-import { QuestionMark } from "@mui/icons-material";
-import { Outlet, useNavigate } from "react-router-dom";
+import React, { useState } from "react";
+import Box from "@mui/material/Box";
+import Container from "@mui/material/Container";
+import { Outlet } from "react-router-dom";
+import AppHeader from "./AppHeader";
+import SideNav from "./SideNav";
+import DrawerHeader from "./DrawerHeader";
+import navigationItems from "../data/navigationItems";
 
-interface DashboardLayoutProps {
-  initialPath?: string; // Make it optional since we have a default value
-  children?: React.ReactNode; // Add children prop
-}
+/**
+ * DashboardLayout component
+ *
+ * This component serves as the main layout for the dashboard.
+ * It combines the AppHeader, SideNav, and content area.
+ */
+const DashboardLayout: React.FC = () => {
+  // State to track if the drawer is open
+  const [open, setOpen] = useState(true);
 
-const NAVIGATION: Navigation = [
-  {
-    kind: "header",
-    title: "Main items",
-  },
-  {
-    segment: "dashboard",
-    title: "Dashboard",
-    icon: <DashboardIcon />,
-  },
-  {
-    segment: "about",
-    title: "About",
-    icon: <QuestionMark />,
-  },
-  {
-    kind: "divider",
-  },
-  {
-    kind: "header",
-    title: "Analytics",
-  },
-  {
-    segment: "reports",
-    title: "Reports",
-    icon: <BarChartIcon />,
-    children: [
-      {
-        segment: "sales",
-        title: "Sales",
-        icon: <DescriptionIcon />,
-      },
-      {
-        segment: "traffic",
-        title: "Traffic",
-        icon: <DescriptionIcon />,
-      },
-    ],
-  },
-  {
-    segment: "integrations",
-    title: "Integrations",
-    icon: <LayersIcon />,
-  },
-];
+  // Handler for opening the drawer
+  const handleDrawerOpen = () => {
+    setOpen(true);
+  };
 
-const demoTheme = extendTheme({
-  colorSchemes: { light: true, dark: true },
-  colorSchemeSelector: "class",
-  breakpoints: {
-    values: {
-      xs: 0,
-      sm: 600,
-      md: 600,
-      lg: 1200,
-      xl: 1536,
-    },
-  },
-});
-
-function useDemoRouter(initialPath: string): Router {
-  const [pathname, setPathname] = React.useState(initialPath);
-
-  const router = React.useMemo(() => {
-    return {
-      pathname,
-      searchParams: new URLSearchParams(),
-      navigate: (path: string | URL) => setPathname(String(path)),
-    };
-  }, [pathname]);
-
-  return router;
-}
-
-const Skeleton = styled("div")<{ height: number }>(({ theme, height }) => ({
-  backgroundColor: theme.palette.action.hover,
-  borderRadius: theme.shape.borderRadius,
-  height,
-  content: '" "',
-}));
-
-export default function DashboardLayoutBasic({
-  initialPath = "/dashboard",
-}: DashboardLayoutProps) {
-  const router = useDemoRouter(initialPath);
-  const navigate = useNavigate(); // Use navigate for programmatic navigation
+  // Handler for closing the drawer
+  const handleDrawerClose = () => {
+    setOpen(false);
+  };
 
   return (
-    <AppProvider
-      branding={{
-        logo: (
-          <img
-            src={require("../assets/travel-planner-ai-gen-logo.jpg")}
-            alt="AI Travel Planner Logo"
-          />
-        ),
-        title: "AI Travel Planner",
-        homeUrl: "/dashboard",
-      }}
-      navigation={NAVIGATION.map((item) =>
-        "segment" in item && item.segment // Only add onClick if segment exists
-          ? {
-              ...item,
-              onClick: () => navigate(item.segment as string), // Ensure navigation works
-            }
-          : item
-      )}
-      theme={demoTheme}
-    >
-      <DashboardLayout>
-        <PageContainer>
-          <Outlet /> {/* This is where your pages will load */}
-        </PageContainer>
-      </DashboardLayout>
-    </AppProvider>
+    <Box sx={{ display: "flex", minHeight: "100vh" }}>
+      {/* App Header */}
+      <AppHeader open={open} handleDrawerOpen={handleDrawerOpen} />
+
+      {/* Side Navigation */}
+      <SideNav
+        open={open}
+        handleDrawerClose={handleDrawerClose}
+        navigationItems={navigationItems}
+      />
+
+      {/* Main Content */}
+      <Box component="main" sx={{ flexGrow: 1, p: 3 }}>
+        <DrawerHeader />
+        <Container maxWidth="lg">
+          <Outlet />
+        </Container>
+      </Box>
+    </Box>
   );
-}
+};
+
+export default DashboardLayout;

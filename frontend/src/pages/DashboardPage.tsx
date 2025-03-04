@@ -128,7 +128,7 @@ export default function Dashboard() {
       {loading ? (
         <Grid container spacing={3}>
           {[1, 2, 3, 4].map((item) => (
-            <Grid xs={12} sm={6} md={4} lg={3} key={item}>
+            <Grid item xs={12} sm={6} md={4} lg={3} key={item}>
               <Box
                 sx={{ height: 250, bgcolor: "action.hover", borderRadius: 1 }}
               />
@@ -139,6 +139,7 @@ export default function Dashboard() {
         <Grid container spacing={3}>
           {trips.map((trip) => (
             <Grid
+              item
               xs={12}
               sm={viewMode === "list" ? 12 : 6}
               md={viewMode === "list" ? 12 : 4}

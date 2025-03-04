@@ -10,7 +10,6 @@ import {
   Chip,
   CardActionArea,
 } from "@mui/material";
-import { styled } from "@mui/material/styles";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
 import ShareIcon from "@mui/icons-material/Share";
@@ -28,18 +27,18 @@ interface TripCardProps {
   viewMode: "grid" | "list";
 }
 
-const StyledCard = styled(Card)<{ viewMode: "grid" | "list" }>(
-  ({ theme, viewMode }) => ({
-    height: "100%",
-    display: "flex",
-    flexDirection: viewMode === "list" ? "row" : "column",
-    transition: "transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out",
-    "&:hover": {
-      transform: "translateY(-4px)",
-      boxShadow: theme.shadows[6],
-    },
-  })
-);
+// Instead of using a styled component with a viewMode prop,
+// we'll create a function that returns the appropriate styles
+const getCardStyles = (viewMode: "grid" | "list", theme: any) => ({
+  height: "100%",
+  display: "flex",
+  flexDirection: viewMode === "list" ? "row" : "column",
+  transition: "transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out",
+  "&:hover": {
+    transform: "translateY(-4px)",
+    boxShadow: theme.shadows[6],
+  },
+});
 
 const TripCard: React.FC<TripCardProps> = ({
   trip,
@@ -54,7 +53,7 @@ const TripCard: React.FC<TripCardProps> = ({
   };
 
   return (
-    <StyledCard viewMode={viewMode}>
+    <Card sx={(theme) => getCardStyles(viewMode, theme)}>
       {viewMode === "grid" ? (
         <CardActionArea>
           <CardMedia
@@ -138,7 +137,7 @@ const TripCard: React.FC<TripCardProps> = ({
           </IconButton>
         </CardActions>
       </Box>
-    </StyledCard>
+    </Card>
   );
 };
 
