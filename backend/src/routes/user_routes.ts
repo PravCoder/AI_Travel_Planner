@@ -1,8 +1,8 @@
-import express, { Request, Response } from "express";
-import { hashPassword } from "../Functions/Password"; // Ensure correct folder casing
+import express, { Router, Request, Response } from "express";
+import { hashPassword } from "../Functions/Password"; // Ensure correct import
 import UserModel from "../models/User"; // Ensure correct model import
 
-const userRouter = express.Router(); // ✅ No need to declare as `Router`
+const userRouter: Router = express.Router(); // Explicitly defining Router type
 
 /**
  * Register Route
@@ -14,16 +14,16 @@ interface RegisterRequestBody {
 }
 
 /*
-* POST MEN REQUEST URL: http://localhost:3001/user/register
-* JSON BODY: 
-* {
-*  "username": "testUser",
-*  "email": "test@example.com",
-*  "password": "SecurePass123"
-* }
-*/
+ * POSTMAN REQUEST URL: http://localhost:3001/user/register
+ * JSON BODY:
+ * {
+ *   "username": "testUser",
+ *   "email": "test@example.com",
+ *   "password": "SecurePass123"
+ * }
+ */
 
-userRouter.post("/register", async (req: Request<{}, {}, RegisterRequestBody>, res: Response) => {
+userRouter.post("/register", async (req: Request, res: Response) => {
   try {
     const { username, email, password } = req.body;
 
