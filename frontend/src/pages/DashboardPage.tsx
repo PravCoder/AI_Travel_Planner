@@ -6,6 +6,7 @@ import ViewListIcon from "@mui/icons-material/ViewList";
 import AddIcon from "@mui/icons-material/Add";
 import TripCard from "../components/TripCard";
 import { Trip } from "../types/trip";
+import { useNavigate } from "react-router-dom";
 
 const DashboardHeader = styled(Box)(({ theme }) => ({
   display: "flex",
@@ -18,6 +19,7 @@ export default function Dashboard() {
   const [trips, setTrips] = useState<Trip[]>([]);
   const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
   const [loading, setLoading] = useState(true);
+  const navigate = useNavigate();
 
   useEffect(() => {
     // In a real app, you would fetch trips from your API
@@ -68,8 +70,9 @@ export default function Dashboard() {
   }, []);
 
   const handleAddTrip = () => {
-    // Navigate to trip creation page or open modal
+    // Navigate to trip creation page
     console.log("Add new trip");
+    navigate("/create-trip");
   };
 
   const handleToggleFavorite = (tripId: string) => {

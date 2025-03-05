@@ -5,6 +5,7 @@ import DashboardLayout from "./components/DashboardLayout";
 import { CustomThemeProvider } from "./context/ThemeContext";
 import DashboardPage from "./pages/DashboardPage";
 import AboutPage from "./pages/AboutPage";
+import CreateTripPage from "./pages/CreateTripPage";
 
 // Placeholder components for routes
 const Reports = () => <div>Reports Content</div>;
@@ -21,6 +22,7 @@ function App() {
           <Route path="/" element={<DashboardLayout />}>
             <Route index element={<DashboardPage />} />
             <Route path="dashboard" element={<DashboardPage />} />
+            <Route path="create-trip" element={<CreateTripPage />} />
             <Route path="about" element={<AboutPage />} />
             <Route path="reports" element={<Reports />} />
             <Route path="reports/sales" element={<Sales />} />
