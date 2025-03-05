@@ -7,7 +7,6 @@ import DashboardPage from "./pages/DashboardPage";
 import AboutPage from "./pages/AboutPage";
 
 // Placeholder components for routes
-const About = () => <div>About Content</div>;
 const Reports = () => <div>Reports Content</div>;
 const Sales = () => <div>Sales Reports Content</div>;
 const Traffic = () => <div>Traffic Reports Content</div>;
