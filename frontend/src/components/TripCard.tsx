@@ -27,8 +27,6 @@ interface TripCardProps {
   viewMode: "grid" | "list";
 }
 
-// Instead of using a styled component with a viewMode prop,
-// we'll create a function that returns the appropriate styles
 const getCardStyles = (viewMode: "grid" | "list", theme: any) => ({
   height: "100%",
   display: "flex",
@@ -52,10 +50,17 @@ const TripCard: React.FC<TripCardProps> = ({
     return `${format(start, "MMM d")} - ${format(end, "MMM d, yyyy")}`;
   };
 
+  // Function to handle card click - will be used for navigation to trip details
+  const handleCardClick = () => {
+    console.log(`Navigating to trip details for: ${trip.id}`);
+    // In the future, this would navigate to the trip details page
+    // navigate(`/trips/${trip.id}`);
+  };
+
   return (
     <Card sx={(theme) => getCardStyles(viewMode, theme)}>
       {viewMode === "grid" ? (
-        <CardActionArea>
+        <CardActionArea onClick={handleCardClick}>
           <CardMedia
             component="img"
             height="140"
@@ -64,12 +69,17 @@ const TripCard: React.FC<TripCardProps> = ({
           />
         </CardActionArea>
       ) : (
-        <CardMedia
-          component="img"
+        <CardActionArea
+          onClick={handleCardClick}
           sx={{ width: 200, minWidth: 200, height: 200 }}
-          image={trip.imageUrl}
-          alt={trip.title}
-        />
+        >
+          <CardMedia
+            component="img"
+            sx={{ width: "100%", height: "100%" }}
+            image={trip.imageUrl}
+            alt={trip.title}
+          />
+        </CardActionArea>
       )}
       <Box sx={{ display: "flex", flexDirection: "column", flexGrow: 1 }}>
         <CardContent sx={{ flexGrow: 1 }}>
