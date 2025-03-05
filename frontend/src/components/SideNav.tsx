@@ -111,25 +111,28 @@ const SideNav: React.FC<SideNavProps> = ({
       </DrawerHeader>
       <Divider />
       <List>
-        <ListItem disablePadding sx={{ display: "block" }}>
-          <ListItemButton
-            sx={{
-              minHeight: 48,
-              justifyContent: open ? "initial" : "center",
-              px: 2.5,
-            }}
-            disabled
-          >
-            <ListItemText
-              primary="Main Items"
-              sx={{ opacity: open ? 1 : 0, fontWeight: "bold" }}
-              primaryTypographyProps={{
-                variant: "subtitle2",
-                color: "text.secondary",
+        {/* Only show section header when drawer is open */}
+        {open && (
+          <ListItem disablePadding sx={{ display: "block" }}>
+            <ListItemButton
+              sx={{
+                minHeight: 48,
+                justifyContent: open ? "initial" : "center",
+                px: 2.5,
               }}
-            />
-          </ListItemButton>
-        </ListItem>
+              disabled
+            >
+              <ListItemText
+                primary="Main Items"
+                sx={{ opacity: open ? 1 : 0, fontWeight: "bold" }}
+                primaryTypographyProps={{
+                  variant: "subtitle2",
+                  color: "text.secondary",
+                }}
+              />
+            </ListItemButton>
+          </ListItem>
+        )}
         {navigationItems.slice(0, 2).map((item) => (
           <ListItem key={item.text} disablePadding sx={{ display: "block" }}>
             <ListItemButton
@@ -159,25 +162,28 @@ const SideNav: React.FC<SideNavProps> = ({
       </List>
       <Divider />
       <List>
-        <ListItem disablePadding sx={{ display: "block" }}>
-          <ListItemButton
-            sx={{
-              minHeight: 48,
-              justifyContent: open ? "initial" : "center",
-              px: 2.5,
-            }}
-            disabled
-          >
-            <ListItemText
-              primary="Analytics"
-              sx={{ opacity: open ? 1 : 0, fontWeight: "bold" }}
-              primaryTypographyProps={{
-                variant: "subtitle2",
-                color: "text.secondary",
+        {/* Only show section header when drawer is open */}
+        {open && (
+          <ListItem disablePadding sx={{ display: "block" }}>
+            <ListItemButton
+              sx={{
+                minHeight: 48,
+                justifyContent: open ? "initial" : "center",
+                px: 2.5,
               }}
-            />
-          </ListItemButton>
-        </ListItem>
+              disabled
+            >
+              <ListItemText
+                primary="Analytics"
+                sx={{ opacity: open ? 1 : 0, fontWeight: "bold" }}
+                primaryTypographyProps={{
+                  variant: "subtitle2",
+                  color: "text.secondary",
+                }}
+              />
+            </ListItemButton>
+          </ListItem>
+        )}
         {navigationItems.slice(2).map((item) => (
           <React.Fragment key={item.text}>
             <ListItem disablePadding sx={{ display: "block" }}>
