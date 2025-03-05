@@ -159,7 +159,7 @@ export default function AboutPage() {
       </Box>
 
       {/* Mission Statement */}
-      <Box sx={{ bgcolor: "primary.light", p: 4, borderRadius: 2 }}>
+      <Box sx={{ bgcolor: "primary.main", p: 4, borderRadius: 2 }}>
         <Typography variant="h5" component="h2" align="center" gutterBottom>
           Our Mission
         </Typography>

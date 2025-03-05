@@ -41,7 +41,7 @@ export default function Dashboard() {
             description: "Exploring the vibrant city of Tokyo",
             startDate: new Date("2023-08-10"),
             endDate: new Date("2023-08-20"),
-            imageUrl: "https://source.unsplash.com/random/300x200/?tokyo",
+            imageUrl: "https://i.imgur.com/ELOjp7x.jpeg",
             isFavorite: false,
           },
           {
@@ -50,7 +50,8 @@ export default function Dashboard() {
             description: "The Big Apple experience",
             startDate: new Date("2023-09-05"),
             endDate: new Date("2023-09-12"),
-            imageUrl: "https://source.unsplash.com/random/300x200/?newyork",
+            imageUrl:
+              "https://plus.unsplash.com/premium_photo-1672082422409-879d79636902?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8NXx8bmV3JTIweW9yayUyMGNpdHl8ZW58MHx8MHx8fDA%3D",
             isFavorite: false,
           },
         ];

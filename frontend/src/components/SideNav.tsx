@@ -127,7 +127,7 @@ const SideNav: React.FC<SideNavProps> = ({
                 sx={{ opacity: open ? 1 : 0, fontWeight: "bold" }}
                 primaryTypographyProps={{
                   variant: "subtitle2",
-                  color: "text.secondary",
+                  color: "text.primary",
                 }}
               />
             </ListItemButton>
@@ -178,7 +178,7 @@ const SideNav: React.FC<SideNavProps> = ({
                 sx={{ opacity: open ? 1 : 0, fontWeight: "bold" }}
                 primaryTypographyProps={{
                   variant: "subtitle2",
-                  color: "text.secondary",
+                  color: "text.primary",
                 }}
               />
             </ListItemButton>
