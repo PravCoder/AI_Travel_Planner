@@ -4,6 +4,7 @@ import { CssBaseline } from "@mui/material";
 import DashboardLayout from "./components/DashboardLayout";
 import { CustomThemeProvider } from "./context/ThemeContext";
 import DashboardPage from "./pages/DashboardPage";
+import AboutPage from "./pages/AboutPage";
 
 // Placeholder components for routes
 const About = () => <div>About Content</div>;
@@ -21,7 +22,7 @@ function App() {
           <Route path="/" element={<DashboardLayout />}>
             <Route index element={<DashboardPage />} />
             <Route path="dashboard" element={<DashboardPage />} />
-            <Route path="about" element={<About />} />
+            <Route path="about" element={<AboutPage />} />
             <Route path="reports" element={<Reports />} />
             <Route path="reports/sales" element={<Sales />} />
             <Route path="reports/traffic" element={<Traffic />} />
