@@ -1,156 +1,215 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   Box,
-  Grid,
-  Paper,
   Typography,
-  TextField,
-  Slider,
+  Paper,
+  IconButton,
   Button,
-  InputAdornment,
-  Stack,
+  Grid,
 } from "@mui/material";
-import { styled } from "@mui/material/styles";
-import SendIcon from "@mui/icons-material/Send";
-import AttachMoneyIcon from "@mui/icons-material/AttachMoney";
+import { v4 as uuidv4 } from "uuid";
+import { TripParameters } from "../components/CompactTripParameters";
+import CompactTripParameters from "../components/CompactTripParameters";
+import ChatInterface, { ChatMessage } from "../components/ChatInterface";
+import MapIntegration from "../components/MapIntegration";
+import AddIcon from "@mui/icons-material/Add";
+import FavoriteBorderIcon from "@mui/icons-material/FavoriteBorder";
+import ShareIcon from "@mui/icons-material/Share";
 
-// Styled components
-const MapPlaceholder = styled(Paper)(({ theme }) => ({
-  height: "100%",
-  minHeight: "500px",
-  display: "flex",
-  alignItems: "center",
-  justifyContent: "center",
-  backgroundColor: theme.palette.grey[100],
-  color: theme.palette.text.secondary,
-}));
-
+/**
+ * CreateTripPage Component
+ *
+ * Main page for creating a new trip using chat-based AI interaction
+ * Features itinerary-style chat and map view similar to travel planning apps
+ */
 const CreateTripPage: React.FC = () => {
-  // State for prompt input
-  const [prompt, setPrompt] = useState("");
+  // Trip parameters state
+  const [tripParameters, setTripParameters] = useState<TripParameters>({
+    location: "Switzerland",
+    startDate: new Date(2023, 6, 14), // July 14, 2023
+    endDate: new Date(2023, 7, 6), // August 6, 2023
+    budget: "medium",
+    travelers: 2,
+  });
 
-  // State for budget slider
-  const [budget, setBudget] = useState<number>(1000);
+  // Chat messages state
+  const [messages, setMessages] = useState<ChatMessage[]>([]);
+  const [isLoading, setIsLoading] = useState(false);
 
-  // Handle prompt change
-  const handlePromptChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setPrompt(event.target.value);
+  // Handle parameter changes
+  const handleParameterChange = (newParams: Partial<TripParameters>) => {
+    setTripParameters((prev) => ({ ...prev, ...newParams }));
   };
 
-  // Handle budget change
-  const handleBudgetChange = (_event: Event, newValue: number | number[]) => {
-    setBudget(newValue as number);
+  // Handle sending a message
+  const handleSendMessage = (messageText: string) => {
+    // Add user message
+    const userMessage: ChatMessage = {
+      id: uuidv4(),
+      text: messageText,
+      sender: "user",
+      timestamp: new Date(),
+    };
+
+    setMessages((prev) => [...prev, userMessage]);
+    setIsLoading(true);
+
+    // Simulate AI response
+    setTimeout(() => {
+      // Create AI response based on the message and parameters
+      const aiResponseText = generateAIResponse(messageText, tripParameters);
+
+      const aiMessage: ChatMessage = {
+        id: uuidv4(),
+        text: aiResponseText,
+        sender: "ai",
+        timestamp: new Date(),
+      };
+
+      setMessages((prev) => [...prev, aiMessage]);
+      setIsLoading(false);
+    }, 1500);
   };
 
-  // Handle form submission
-  const handleSubmit = (event: React.FormEvent) => {
-    event.preventDefault();
-
-    // Log the prompt and budget values to the console
-    console.log("Trip generation request:");
-    console.log("Prompt:", prompt);
-    console.log("Budget: $" + budget);
-
-    // Here we would send the data to the backend/AI model
-    // Example API call:
-    // api.generateTrip({ prompt, budget })
-    //   .then(response => {
-    //     // Handle successful response
-    //   })
-    //   .catch(error => {
-    //     // Handle error
-    //   });
+  // Function to generate mock AI responses
+  const generateAIResponse = (
+    message: string,
+    params: TripParameters
+  ): string => {
+    return ""; // TODO: Implement AI response generation with OpenAI API
   };
+
+  // Add a welcome message when the component mounts
+  useEffect(() => {
+    const welcomeMessage: ChatMessage = {
+      id: uuidv4(),
+      text: "Welcome to your travel planner! Start by setting your trip parameters, then ask me to help you plan your perfect vacation.",
+      sender: "ai",
+      timestamp: new Date(),
+    };
+    setMessages([welcomeMessage]);
+  }, []);
 
   return (
-    <Box sx={{ p: 3 }}>
-      <Typography variant="h4" component="h1" gutterBottom>
-        Create New Trip
-      </Typography>
+    <Box
+      sx={{
+        height: "calc(100vh - 120px)",
+        width: "100%",
+        display: "flex",
+        flexDirection: "column",
+        padding: 0,
+        margin: 0,
+        maxWidth: "100%", // Ensure it doesn't get constrained
+        overflow: "hidden", // Prevent overflow
+      }}
+    >
+      {/* Header with trip title and parameters */}
+      <Paper
+        elevation={2}
+        sx={{
+          p: 2,
+          mb: 2,
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center",
+          borderRadius: 0,
+        }}
+      >
+        <Typography variant="h5" component="h1" fontWeight="bold">
+          New Trip
+        </Typography>
 
-      <Grid container spacing={3}>
-        {/* Left side - Prompt and Budget controls */}
-        <Grid item xs={12} md={6}>
-          <Paper sx={{ p: 3, height: "100%" }}>
-            <form onSubmit={handleSubmit}>
-              <Stack spacing={4}>
-                {/* Prompt section */}
-                <Box>
-                  <Typography variant="h6" gutterBottom>
-                    Describe your dream trip
-                  </Typography>
-                  <TextField
-                    fullWidth
-                    multiline
-                    rows={6}
-                    variant="outlined"
-                    placeholder="Example: I want to plan a 7-day trip to Japan in April, focusing on traditional culture and food 
-                    experiences."
-                    value={prompt}
-                    onChange={handlePromptChange}
-                    sx={{ mb: 2 }}
-                  />
-                </Box>
+        {/* Compact trip parameters in the center */}
+        <CompactTripParameters
+          parameters={tripParameters}
+          onParametersChange={handleParameterChange}
+        />
 
-                {/* Budget slider */}
-                <Box>
-                  <Typography variant="h6" gutterBottom>
-                    Set your budget
-                  </Typography>
-                  <Box sx={{ display: "flex", alignItems: "center", mb: 2 }}>
-                    <AttachMoneyIcon color="primary" />
-                    <Slider
-                      value={budget}
-                      onChange={handleBudgetChange}
-                      min={100}
-                      max={10000}
-                      step={100}
-                      valueLabelDisplay="auto"
-                      aria-labelledby="budget-slider"
-                      sx={{ mx: 2, flexGrow: 1 }}
-                    />
-                    <TextField
-                      value={budget}
-                      onChange={(e) => {
-                        const value = parseInt(e.target.value);
-                        if (!isNaN(value) && value >= 100 && value <= 10000) {
-                          setBudget(value);
-                        }
-                      }}
-                      InputProps={{
-                        startAdornment: (
-                          <InputAdornment position="start">$</InputAdornment>
-                        ),
-                      }}
-                      sx={{ width: "100px" }}
-                    />
-                  </Box>
-                </Box>
+        <Box sx={{ display: "flex", gap: 1 }}>
+          <Button
+            variant="outlined"
+            size="small"
+            startIcon={<FavoriteBorderIcon />}
+          >
+            Save
+          </Button>
+          <Button variant="outlined" size="small" startIcon={<ShareIcon />}>
+            Share
+          </Button>
+        </Box>
+      </Paper>
 
-                {/* Submit button */}
-                <Box sx={{ mt: 2 }}>
-                  <Button
-                    type="submit"
-                    variant="contained"
-                    color="primary"
-                    endIcon={<SendIcon />}
-                    size="large"
-                  >
-                    Generate Trip
-                  </Button>
-                </Box>
-              </Stack>
-            </form>
+      {/* Main Content Area */}
+      <Grid
+        container
+        spacing={0}
+        sx={{
+          flexGrow: 1,
+          overflow: "hidden",
+          m: 0,
+          width: "100%",
+        }}
+      >
+        {/* Itinerary Panel */}
+        <Grid item xs={12} md={4} sx={{ height: "100%", pr: 1 }}>
+          <Paper
+            elevation={2}
+            sx={{
+              height: "100%",
+              display: "flex",
+              flexDirection: "column",
+              overflow: "hidden",
+              borderRadius: 0,
+              boxShadow: "0 4px 6px rgba(0,0,0,0.1)",
+            }}
+          >
+            <Box
+              sx={{
+                p: 2,
+                borderBottom: "1px solid",
+                borderColor: "divider",
+                display: "flex",
+                justifyContent: "space-between",
+                alignItems: "center",
+              }}
+            >
+              <Typography variant="h6" component="h2">
+                Trip Itinerary
+              </Typography>
+              <IconButton size="small">
+                <AddIcon />
+              </IconButton>
+            </Box>
+            <Box
+              sx={{
+                flexGrow: 1,
+                overflowY: "auto",
+                p: 2,
+                bgcolor: "#f8f9fa",
+                display: "flex",
+                flexDirection: "column",
+                // Position the chat box at the bottom of this section
+                "& > *:last-child": {
+                  marginTop: "auto",
+                },
+              }}
+            >
+              <ChatInterface
+                messages={messages}
+                onSendMessage={handleSendMessage}
+                isLoading={isLoading}
+                itineraryStyle={true}
+              />
+            </Box>
           </Paper>
         </Grid>
 
-        {/* Right side - Map placeholder */}
-        <Grid item xs={12} md={6}>
-          <MapPlaceholder>
-            <Typography variant="h6">
-              Google Maps will be integrated here
-            </Typography>
-          </MapPlaceholder>
+        {/* Map Section */}
+        <Grid item xs={12} md={8} sx={{ height: "100%", pl: 1 }}>
+          <MapIntegration
+            location={tripParameters.location || "Tokyo, Japan"}
+            onLocationSelect={(loc) => handleParameterChange({ location: loc })}
+          />
         </Grid>
       </Grid>
     </Box>

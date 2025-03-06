@@ -5,7 +5,6 @@ import DescriptionIcon from "@mui/icons-material/Description";
 import LayersIcon from "@mui/icons-material/Layers";
 import QuestionMarkIcon from "@mui/icons-material/QuestionMark";
 import { NavigationItem } from "../components/SideNav";
-import AddCircleOutlineIcon from "@mui/icons-material/AddCircleOutline";
 
 // Define the navigation items
 const navigationItems: NavigationItem[] = [
@@ -13,11 +12,6 @@ const navigationItems: NavigationItem[] = [
     text: "Dashboard",
     icon: <DashboardIcon />,
     path: "/dashboard",
-  },
-  {
-    text: "Create Trip",
-    icon: <AddCircleOutlineIcon />,
-    path: "/create-trip",
   },
   {
     text: "About",
