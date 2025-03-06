@@ -131,7 +131,7 @@ const CreateTripPage: React.FC = () => {
             size="small"
             startIcon={<FavoriteBorderIcon />}
           >
-            Save
+            Favorite
           </Button>
           <Button variant="outlined" size="small" startIcon={<ShareIcon />}>
             Share
