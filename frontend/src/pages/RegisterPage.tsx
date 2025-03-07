@@ -84,7 +84,7 @@ const RegisterPage: React.FC = () => {
     setIsLoading(true);
     try {
       const response = await axios.post(
-        "http://localhost:3001/user/register",
+        "http://localhost:3001/user/register",  // send request to backend-register-endpoint
         {
           username: formData.username,
           email: formData.email,
