@@ -18,10 +18,13 @@ export const registerController = async (req: Request<{}, {}, RegisterBody>, res
       const existingUser = await UserModel.findOne({ email });
   
       if (existingUser) {
+        console.log("user already exists")
         res.status(400).json({ error: "User already exists" });
+        return;
       }
-  
-     const hashedPassword = await hashPassword(password);
+      
+      console.log("create new user");
+      const hashedPassword = await hashPassword(password);
       const newUser = new UserModel({ username, email, password: hashedPassword });
       await newUser.save();
   
