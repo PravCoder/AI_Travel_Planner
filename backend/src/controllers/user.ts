@@ -19,7 +19,7 @@ export const registerController = async (req: Request<{}, {}, RegisterBody>, res
   
       if (existingUser) {
         console.log("user already exists")
-        res.status(400).json({ error: "User already exists" });
+        res.status(400).json({ error: "User already exists", message: "A user with this email already exists"});
         return;
       }
       
