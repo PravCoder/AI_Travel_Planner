@@ -18,6 +18,7 @@ userRouter.post("/register", UserController.registerController);
 /**
  * Login Route
 */
+userRouter.post("/login", UserController.loginController);
 
 
 /*
