@@ -2,4 +2,85 @@
 * {
   margin: 0;
   padding: 0;
+
+/* Import Roboto font */
+@import url('https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap');
+
+/* CSS Reset and Base Styles */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+/* Base styles for HTML and body elements */
+html, body {
+  height: 100%; /* Full viewport height */
+  font-family: 'Roboto', sans-serif; /* Set Roboto as primary font */
+  -webkit-font-smoothing: antialiased; /* Smooth font rendering on webkit browsers */
+  -moz-osx-font-smoothing: grayscale; /* Smooth font rendering on Firefox */
+  background-color: #f5f5f5; /* Light gray background */
+}
+
+body {
+  line-height: 1.5;
+  color: #333;
+}
+
+/* Remove default styles for lists */
+ul, ol {
+  list-style: none;
+}
+
+/* Reset link styles */
+a {
+  text-decoration: none;
+  color: inherit;
+}
+
+/* Reset button styles */
+button {
+  font-family: 'Roboto', sans-serif;
+  cursor: pointer;
+}
+
+/* Remove default input styles */
+input, textarea, select {
+  font-family: 'Roboto', sans-serif;
+}
+
+/* Container class for consistent width */
+.container {
+  width: 100%;
+  max-width: 1200px; /* Maximum width for larger screens */
+  margin: 0 auto; /* Center the container */
+  padding: 0 1rem; /* Add padding on sides */
+}
+
+/* Utility classes */
+.text-center {
+  text-align: center;
+}
+
+.mt-1 { margin-top: 0.25rem; }
+.mt-2 { margin-top: 0.5rem; }
+.mt-4 { margin-top: 1rem; }
+.mt-8 { margin-top: 2rem; }
+
+.mb-1 { margin-bottom: 0.25rem; }
+.mb-2 { margin-bottom: 0.5rem; }
+.mb-4 { margin-bottom: 1rem; }
+.mb-8 { margin-bottom: 2rem; }
+
+/* Responsive font sizes */
+@media (max-width: 768px) {
+  html {
+    font-size: 14px;
+  }
+}
+
+@media (max-width: 480px) {
+  html {
+    font-size: 13px;
+  }
 }
