@@ -83,14 +83,11 @@ const RegisterPage: React.FC = () => {
 
     setIsLoading(true);
     try {
-      const response = await axios.post(
-        "http://localhost:3001/api/auth/register",
-        {
-          username: formData.username,
-          email: formData.email,
-          password: formData.password,
-        }
-      );
+      const response = await axios.post("http://localhost:3001/user/register", {
+        username: formData.username,
+        email: formData.email,
+        password: formData.password,
+      });
 
       if (response.data.success) {
         navigate("/login");
