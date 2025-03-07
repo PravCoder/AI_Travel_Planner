@@ -92,7 +92,7 @@ const RegisterPage: React.FC = () => {
         }
       );
 
-      if (response.data.success) {
+      if (response.data.redirect_now) {
         navigate("/login");
       }
     } catch (error) {

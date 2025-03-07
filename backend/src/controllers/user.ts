@@ -28,7 +28,7 @@ export const registerController = async (req: Request<{}, {}, RegisterBody>, res
       const newUser = new UserModel({ username, email, password: hashedPassword });
       await newUser.save();
   
-      res.status(201).json({ message: "User registered successfully!" });
+      res.status(201).json({ message: "User registered successfully!", redirect_now: true });
     } catch (error) {
       console.error("Error in register route:", error);
       res.status(500).json({ error: "Error registering user" });
