@@ -59,7 +59,7 @@ export const loginController = async (req: Request<{}, {}, loginBody>, res: Resp
       }
       // if email does exist password matches
       else if (passwords_match == true) {
-        res.json({userID:user._id, message:"user successfully logged in"});
+        res.json({userID:user._id, message:"user successfully logged in", redirect_now: true});
       }
 
     }

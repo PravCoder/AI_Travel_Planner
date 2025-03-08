@@ -71,16 +71,16 @@ const LoginPage: React.FC = () => {
     setIsLoading(true);
     try {
       const response = await axios.post(
-        "http://localhost:3001/api/auth/login",
+        "http://localhost:3001/user/login",
         {
           email: formData.email,
           password: formData.password,
         }
       );
 
-      if (response.data.success) {
+      if (response.data.redirect_now) {
         // Store the token in localStorage or a secure cookie
-        localStorage.setItem("token", response.data.token);
+        localStorage.setItem("userID", response.data.userID);
         navigate("/dashboard"); // Redirect to dashboard after successful login
       }
     } catch (error) {
