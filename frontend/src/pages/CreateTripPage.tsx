@@ -38,7 +38,38 @@ const CreateTripPage: React.FC = () => {
 
   // Handle parameter changes
   const handleParameterChange = (newParams: Partial<TripParameters>) => {
-    setTripParameters((prev) => ({ ...prev, ...newParams }));
+    setTripParameters((prev) => {
+      const updated = { ...prev, ...newParams };
+
+      // Log budget changes specifically
+      if ("budget" in newParams && newParams.budget !== undefined) {
+        const budgetValue = newParams.budget;
+        // Map budget string values to their display names
+        const budgetDisplayMap: Record<string, string> = {
+          budget: "Budget",
+          economy: "Economy",
+          medium: "Medium",
+          premium: "Premium",
+          luxury: "Luxury",
+        };
+        // Map budget string values to their number of $
+        const budgetValueMap: Record<string, string> = {
+          budget: "$",
+          economy: "$$",
+          medium: "$$$",
+          premium: "$$$$",
+          luxury: "$$$$$",
+        };
+
+        console.log(
+          "Budget changed:",
+          budgetDisplayMap[budgetValue.toString()] || budgetValue,
+          `(Value: ${budgetValueMap[budgetValue.toString()] || budgetValue})`
+        );
+      }
+
+      return updated;
+    });
   };
 
   // Handle sending a message

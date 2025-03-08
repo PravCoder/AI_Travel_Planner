@@ -203,9 +203,7 @@ const TripParametersBar: React.FC<TripParametersBarProps> = ({
             </Typography>
             <Slider
               value={parameters.budget}
-              onChange={(_, value) =>
-                handleParameterChange("budget", value as number)
-              }
+              onChange={(_, value) => handleParameterChange("budget", value)}
               min={1}
               max={5}
               step={1}
