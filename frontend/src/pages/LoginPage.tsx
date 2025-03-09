@@ -130,7 +130,6 @@ const LoginPage: React.FC = () => {
           </div>
 
           {serverError && <div className="server-error">{serverError}</div>}
-
           <button type="submit" disabled={isLoading}>
             {isLoading ? "Signing in..." : "Sign In"}
           </button>
