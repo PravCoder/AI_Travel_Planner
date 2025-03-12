@@ -6,6 +6,7 @@ import {
   IconButton,
   Button,
   Grid,
+  useTheme,
 } from "@mui/material";
 import { v4 as uuidv4 } from "uuid";
 import { useSearchParams } from "react-router-dom";
@@ -24,13 +25,19 @@ import ShareIcon from "@mui/icons-material/Share";
  * Features itinerary-style chat and map view similar to travel planning apps
  */
 const CreateTripPage: React.FC = () => {
+  const theme = useTheme();
   const [searchParams] = useSearchParams();
+
+  // Get today's date and a date 3 weeks from now for default trip dates
+  const today = new Date();
+  const twoWeeksLater = new Date();
+  twoWeeksLater.setDate(today.getDate() + 14);
 
   // Trip parameters state - initialize with URL param if available
   const [tripParameters, setTripParameters] = useState<TripParameters>({
     location: searchParams.get("destination") || "Switzerland",
-    startDate: new Date(2023, 6, 14), // July 14, 2023
-    endDate: new Date(2023, 7, 6), // August 6, 2023
+    startDate: today,
+    endDate: twoWeeksLater,
     budget: "medium",
     travelers: 2,
   });
@@ -137,8 +144,8 @@ const CreateTripPage: React.FC = () => {
         flexDirection: "column",
         padding: 0,
         margin: 0,
-        maxWidth: "100%", // Ensure it doesn't get constrained
-        overflow: "hidden", // Prevent overflow
+        maxWidth: "100%",
+        overflow: "hidden",
       }}
     >
       {/* Header with trip title and parameters */}
@@ -150,7 +157,8 @@ const CreateTripPage: React.FC = () => {
           display: "flex",
           justifyContent: "space-between",
           alignItems: "center",
-          borderRadius: 0,
+          borderRadius: 2,
+          bgcolor: theme.palette.background.paper,
         }}
       >
         <Typography variant="h5" component="h1" fontWeight="bold">
@@ -193,8 +201,9 @@ const CreateTripPage: React.FC = () => {
               display: "flex",
               flexDirection: "column",
               overflow: "hidden",
-              borderRadius: 0,
+              borderRadius: 2,
               boxShadow: "0 4px 6px rgba(0,0,0,0.1)",
+              bgcolor: theme.palette.background.paper,
             }}
           >
             <Box
@@ -219,10 +228,12 @@ const CreateTripPage: React.FC = () => {
                 flexGrow: 1,
                 overflowY: "auto",
                 p: 2,
-                bgcolor: "#f8f9fa",
+                bgcolor:
+                  theme.palette.mode === "dark"
+                    ? "rgba(30, 30, 30, 0.6)"
+                    : "#f8f9fa",
                 display: "flex",
                 flexDirection: "column",
-                // Position the chat box at the bottom of this section
                 "& > *:last-child": {
                   marginTop: "auto",
                 },

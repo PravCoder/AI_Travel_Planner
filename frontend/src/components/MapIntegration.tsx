@@ -1,5 +1,5 @@
 import React from "react";
-import { Box, Paper, Typography, IconButton } from "@mui/material";
+import { Box, Paper, Typography, IconButton, useTheme } from "@mui/material";
 import PlaceIcon from "@mui/icons-material/Place";
 import ZoomInIcon from "@mui/icons-material/ZoomIn";
 import ZoomOutIcon from "@mui/icons-material/ZoomOut";
@@ -14,8 +14,13 @@ const MapIntegration: React.FC<MapIntegrationProps> = ({
   location = "Tokyo, Japan",
   onLocationSelect,
 }) => {
-  // In a real implementation, you would integrate with Google Maps API
-  // This is a placeholder showing how the component would be structured
+  const theme = useTheme();
+
+  // Gray color for headers in dark mode to match ChatInterface
+  const headerBgColor =
+    theme.palette.mode === "dark"
+      ? "rgba(50, 50, 50, 0.2)"
+      : theme.palette.background.paper;
 
   return (
     <Paper
@@ -38,6 +43,7 @@ const MapIntegration: React.FC<MapIntegrationProps> = ({
           alignItems: "center",
           borderBottom: "1px solid",
           borderColor: "divider",
+          bgcolor: headerBgColor,
         }}
       >
         <Box display="flex" alignItems="center">
@@ -63,7 +69,7 @@ const MapIntegration: React.FC<MapIntegrationProps> = ({
       <Box
         sx={{
           flexGrow: 1,
-          bgcolor: "#e5f6fd",
+          bgcolor: theme.palette.mode === "dark" ? "#1e2a3a" : "#e5f6fd",
           position: "relative",
           backgroundImage:
             "url(https://maps.googleapis.com/maps/api/staticmap?center=Tokyo,Japan&zoom=12&size=800x800&key=YOUR_API_KEY)",
@@ -77,12 +83,15 @@ const MapIntegration: React.FC<MapIntegrationProps> = ({
         {/* Placeholder for actual map integration */}
         <Typography
           variant="body1"
-          color="text.secondary"
           sx={{
             position: "absolute",
             bottom: 20,
             left: 20,
-            backgroundColor: "rgba(255, 255, 255, 0.8)",
+            backgroundColor:
+              theme.palette.mode === "dark"
+                ? "rgba(0, 0, 0, 0.7)"
+                : "rgba(255, 255, 255, 0.8)",
+            color: theme.palette.text.primary,
             p: 1,
             borderRadius: 1,
           }}
@@ -113,6 +122,7 @@ const MapIntegration: React.FC<MapIntegrationProps> = ({
           borderColor: "divider",
           display: "flex",
           justifyContent: "flex-end",
+          bgcolor: headerBgColor,
         }}
       >
         <Typography variant="caption" color="text.secondary">
