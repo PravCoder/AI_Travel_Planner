@@ -35,7 +35,7 @@ const CreateTripPage: React.FC = () => {
 
   // Trip parameters state - initialize with URL param if available
   const [tripParameters, setTripParameters] = useState<TripParameters>({
-    location: searchParams.get("destination") || "Switzerland",
+    location: searchParams.get("destination") || "New Trip",
     startDate: today,
     endDate: twoWeeksLater,
     budget: "medium",
@@ -95,14 +95,14 @@ const CreateTripPage: React.FC = () => {
     setMessages((prev) => [...prev, userMessage]);
     setIsLoading(true);
 
-    // Simulate AI response
+    // Simulate AI response with a simple confirmation
     setTimeout(() => {
-      // Create AI response based on the message and parameters
-      const aiResponseText = generateAIResponse(messageText, tripParameters);
-
       const aiMessage: ChatMessage = {
         id: uuidv4(),
-        text: aiResponseText,
+        text:
+          "Message received! I'll help you plan your trip to " +
+          tripParameters.location +
+          ".",
         sender: "ai",
         timestamp: new Date(),
       };
@@ -227,7 +227,7 @@ const CreateTripPage: React.FC = () => {
               sx={{
                 flexGrow: 1,
                 overflowY: "auto",
-                p: 2,
+                p: 0,
                 bgcolor:
                   theme.palette.mode === "dark"
                     ? "rgba(30, 30, 30, 0.6)"
@@ -243,7 +243,6 @@ const CreateTripPage: React.FC = () => {
                 messages={messages}
                 onSendMessage={handleSendMessage}
                 isLoading={isLoading}
-                itineraryStyle={true}
               />
             </Box>
           </Paper>
@@ -252,7 +251,7 @@ const CreateTripPage: React.FC = () => {
         {/* Map Section */}
         <Grid item xs={12} md={6} sx={{ height: "100%", pl: 1 }}>
           <MapIntegration
-            location={tripParameters.location || "Tokyo, Japan"}
+            location={tripParameters.location || ""}
             onLocationSelect={(loc) => handleParameterChange({ location: loc })}
           />
         </Grid>
