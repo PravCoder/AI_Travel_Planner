@@ -8,12 +8,13 @@ import {
   Grid,
 } from "@mui/material";
 import { v4 as uuidv4 } from "uuid";
+import { useSearchParams } from "react-router-dom";
 import { TripParameters } from "../components/CompactTripParameters";
 import CompactTripParameters from "../components/CompactTripParameters";
 import ChatInterface, { ChatMessage } from "../components/ChatInterface";
 import MapIntegration from "../components/MapIntegration";
 import AddIcon from "@mui/icons-material/Add";
-import FavoriteBorderIcon from "@mui/icons-material/FavoriteBorder";
+import SaveIcon from "@mui/icons-material/Save";
 import ShareIcon from "@mui/icons-material/Share";
 
 /**
@@ -23,9 +24,11 @@ import ShareIcon from "@mui/icons-material/Share";
  * Features itinerary-style chat and map view similar to travel planning apps
  */
 const CreateTripPage: React.FC = () => {
-  // Trip parameters state
+  const [searchParams] = useSearchParams();
+
+  // Trip parameters state - initialize with URL param if available
   const [tripParameters, setTripParameters] = useState<TripParameters>({
-    location: "Switzerland",
+    location: searchParams.get("destination") || "Switzerland",
     startDate: new Date(2023, 6, 14), // July 14, 2023
     endDate: new Date(2023, 7, 6), // August 6, 2023
     budget: "medium",
@@ -112,14 +115,18 @@ const CreateTripPage: React.FC = () => {
 
   // Add a welcome message when the component mounts
   useEffect(() => {
+    const destinationName = tripParameters.location;
+
     const welcomeMessage: ChatMessage = {
       id: uuidv4(),
-      text: "Welcome to your travel planner! Start by setting your trip parameters, then ask me to help you plan your perfect vacation.",
+      text: destinationName
+        ? `Welcome to your travel planner! I see you're interested in visiting ${destinationName}. Let me help you plan your perfect vacation.`
+        : "Welcome to your travel planner! Start by setting your trip parameters, then ask me to help you plan your perfect vacation.",
       sender: "ai",
       timestamp: new Date(),
     };
     setMessages([welcomeMessage]);
-  }, []);
+  }, [tripParameters.location]);
 
   return (
     <Box
@@ -157,12 +164,8 @@ const CreateTripPage: React.FC = () => {
         />
 
         <Box sx={{ display: "flex", gap: 1 }}>
-          <Button
-            variant="outlined"
-            size="small"
-            startIcon={<FavoriteBorderIcon />}
-          >
-            Favorite
+          <Button variant="outlined" size="small" startIcon={<SaveIcon />}>
+            Save to Dashboard
           </Button>
           <Button variant="outlined" size="small" startIcon={<ShareIcon />}>
             Share
@@ -182,7 +185,7 @@ const CreateTripPage: React.FC = () => {
         }}
       >
         {/* Itinerary Panel */}
-        <Grid item xs={12} md={4} sx={{ height: "100%", pr: 1 }}>
+        <Grid item xs={12} md={6} sx={{ height: "100%", pr: 1 }}>
           <Paper
             elevation={2}
             sx={{
@@ -236,7 +239,7 @@ const CreateTripPage: React.FC = () => {
         </Grid>
 
         {/* Map Section */}
-        <Grid item xs={12} md={8} sx={{ height: "100%", pl: 1 }}>
+        <Grid item xs={12} md={6} sx={{ height: "100%", pl: 1 }}>
           <MapIntegration
             location={tripParameters.location || "Tokyo, Japan"}
             onLocationSelect={(loc) => handleParameterChange({ location: loc })}

@@ -10,10 +10,14 @@ import ListItem from "@mui/material/ListItem";
 import ListItemButton from "@mui/material/ListItemButton";
 import ListItemIcon from "@mui/material/ListItemIcon";
 import ListItemText from "@mui/material/ListItemText";
-import Collapse from "@mui/material/Collapse";
-import ExpandLess from "@mui/icons-material/ExpandLess";
-import ExpandMore from "@mui/icons-material/ExpandMore";
+import Menu from "@mui/material/Menu";
+import MenuItem from "@mui/material/MenuItem";
+import AccountCircleIcon from "@mui/icons-material/AccountCircle";
+import SettingsIcon from "@mui/icons-material/Settings";
+import TuneIcon from "@mui/icons-material/Tune";
+import ExitToAppIcon from "@mui/icons-material/ExitToApp";
 import { useNavigate } from "react-router-dom";
+import Box from "@mui/material/Box";
 
 // Define the drawer width
 const drawerWidth = 240;
@@ -92,10 +96,20 @@ const SideNav: React.FC<SideNavProps> = ({
 }) => {
   const theme = useTheme();
   const navigate = useNavigate();
-  const [openSubMenu, setOpenSubMenu] = useState<string | null>(null);
+  // const [openSubMenu, setOpenSubMenu] = useState<string | null>(null); {used for sidebar options with submenus}
+  const [profileMenuAnchorEl, setProfileMenuAnchorEl] =
+    useState<null | HTMLElement>(null);
 
-  const handleSubMenuToggle = (path: string) => {
+  /* const handleSubMenuToggle = (path: string) => {
     setOpenSubMenu(openSubMenu === path ? null : path);
+  }; {used for sidebar options with submenus - used with const [openSubMenu, setOpenSubMenu] = useState<string | null>(null);} */
+
+  const handleProfileMenuOpen = (event: React.MouseEvent<HTMLElement>) => {
+    setProfileMenuAnchorEl(event.currentTarget);
+  };
+
+  const handleProfileMenuClose = () => {
+    setProfileMenuAnchorEl(null);
   };
 
   return (
@@ -133,6 +147,7 @@ const SideNav: React.FC<SideNavProps> = ({
             </ListItemButton>
           </ListItem>
         )}
+        {/* Display only first two main navigation items */}
         {navigationItems.slice(0, 2).map((item) => (
           <ListItem key={item.text} disablePadding sx={{ display: "block" }}>
             <ListItemButton
@@ -160,9 +175,10 @@ const SideNav: React.FC<SideNavProps> = ({
           </ListItem>
         ))}
       </List>
+
+      {/* Other section */}
       <Divider />
       <List>
-        {/* Only show section header when drawer is open */}
         {open && (
           <ListItem disablePadding sx={{ display: "block" }}>
             <ListItemButton
@@ -174,7 +190,7 @@ const SideNav: React.FC<SideNavProps> = ({
               disabled
             >
               <ListItemText
-                primary="Analytics"
+                primary="Other"
                 sx={{ opacity: open ? 1 : 0, fontWeight: "bold" }}
                 primaryTypographyProps={{
                   variant: "subtitle2",
@@ -184,64 +200,106 @@ const SideNav: React.FC<SideNavProps> = ({
             </ListItemButton>
           </ListItem>
         )}
-        {navigationItems.slice(2).map((item) => (
-          <React.Fragment key={item.text}>
-            <ListItem disablePadding sx={{ display: "block" }}>
-              <ListItemButton
-                sx={{
-                  minHeight: 48,
-                  justifyContent: open ? "initial" : "center",
-                  px: 2.5,
-                }}
-                onClick={() => {
-                  if (item.children) {
-                    handleSubMenuToggle(item.path);
-                  } else {
-                    navigate(item.path);
-                  }
-                }}
-              >
-                <ListItemIcon
-                  sx={{
-                    minWidth: 0,
-                    mr: open ? 3 : "auto",
-                    justifyContent: "center",
-                  }}
-                >
-                  {item.icon}
-                </ListItemIcon>
-                <ListItemText
-                  primary={item.text}
-                  sx={{ opacity: open ? 1 : 0 }}
-                />
-                {item.children &&
-                  open &&
-                  (openSubMenu === item.path ? <ExpandLess /> : <ExpandMore />)}
-              </ListItemButton>
-            </ListItem>
-            {item.children && (
-              <Collapse
-                in={openSubMenu === item.path && open}
-                timeout="auto"
-                unmountOnExit
-              >
-                <List component="div" disablePadding>
-                  {item.children.map((child) => (
-                    <ListItemButton
-                      key={child.text}
-                      sx={{ pl: 4 }}
-                      onClick={() => navigate(child.path)}
-                    >
-                      <ListItemIcon>{child.icon}</ListItemIcon>
-                      <ListItemText primary={child.text} />
-                    </ListItemButton>
-                  ))}
-                </List>
-              </Collapse>
-            )}
-          </React.Fragment>
-        ))}
+        <ListItem disablePadding sx={{ display: "block" }}>
+          <ListItemButton
+            sx={{
+              minHeight: 48,
+              justifyContent: open ? "initial" : "center",
+              px: 2.5,
+            }}
+            onClick={() => navigate(navigationItems[2].path)}
+          >
+            <ListItemIcon
+              sx={{
+                minWidth: 0,
+                mr: open ? 3 : "auto",
+                justifyContent: "center",
+              }}
+            >
+              {navigationItems[2].icon}
+            </ListItemIcon>
+            <ListItemText
+              primary={navigationItems[2].text}
+              sx={{ opacity: open ? 1 : 0 }}
+            />
+          </ListItemButton>
+        </ListItem>
       </List>
+
+      {/* Profile Menu at the bottom */}
+      <Box sx={{ flexGrow: 1 }} />
+      <Divider />
+      <List>
+        <ListItem disablePadding sx={{ display: "block" }}>
+          <ListItemButton
+            sx={{
+              minHeight: 48,
+              justifyContent: open ? "initial" : "center",
+              px: 2.5,
+            }}
+            onMouseEnter={handleProfileMenuOpen}
+          >
+            <ListItemIcon
+              sx={{
+                minWidth: 0,
+                mr: open ? 3 : "auto",
+                justifyContent: "center",
+              }}
+            >
+              <AccountCircleIcon />
+            </ListItemIcon>
+            <ListItemText primary="Profile" sx={{ opacity: open ? 1 : 0 }} />
+          </ListItemButton>
+        </ListItem>
+      </List>
+
+      {/* Profile Popup Menu */}
+      <Menu
+        anchorEl={profileMenuAnchorEl}
+        open={Boolean(profileMenuAnchorEl)}
+        onClose={handleProfileMenuClose}
+        anchorOrigin={{
+          vertical: "center",
+          horizontal: "right",
+        }}
+        transformOrigin={{
+          vertical: "center",
+          horizontal: "left",
+        }}
+        MenuListProps={{
+          onMouseLeave: handleProfileMenuClose,
+        }}
+        PaperProps={{
+          elevation: 3,
+          sx: { minWidth: 180 },
+        }}
+      >
+        <MenuItem onClick={handleProfileMenuClose}>
+          <ListItemIcon>
+            <AccountCircleIcon fontSize="small" />
+          </ListItemIcon>
+          <ListItemText primary="My Account" />
+        </MenuItem>
+        <MenuItem onClick={handleProfileMenuClose}>
+          <ListItemIcon>
+            <SettingsIcon fontSize="small" />
+          </ListItemIcon>
+          <ListItemText primary="Settings" />
+        </MenuItem>
+        <MenuItem onClick={handleProfileMenuClose}>
+          <ListItemIcon>
+            <TuneIcon fontSize="small" />
+          </ListItemIcon>
+          <ListItemText primary="Preferences" />
+        </MenuItem>
+        <Divider />
+        <MenuItem onClick={handleProfileMenuClose}>
+          <ListItemIcon>
+            <ExitToAppIcon fontSize="small" />
+          </ListItemIcon>
+          <ListItemText primary="Logout" />
+        </MenuItem>
+      </Menu>
     </Drawer>
   );
 };

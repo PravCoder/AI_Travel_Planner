@@ -1,6 +1,13 @@
 import React, { useState, useEffect } from "react";
 import { styled } from "@mui/material/styles";
-import { Box, Typography, Button, ButtonGroup, Grid } from "@mui/material";
+import {
+  Box,
+  Typography,
+  Button,
+  ButtonGroup,
+  Grid,
+  Container,
+} from "@mui/material";
 import ViewModuleIcon from "@mui/icons-material/ViewModule";
 import ViewListIcon from "@mui/icons-material/ViewList";
 import AddIcon from "@mui/icons-material/Add";
@@ -98,7 +105,7 @@ export default function Dashboard() {
   };
 
   return (
-    <>
+    <Container maxWidth="lg" sx={{ py: 4 }}>
       <DashboardHeader>
         <Typography variant="h4" component="h1">
           My Trips
@@ -132,7 +139,7 @@ export default function Dashboard() {
       {loading ? (
         <Grid container spacing={3}>
           {[1, 2, 3, 4].map((item) => (
-            <Grid item xs={12} sm={6} md={4} lg={3} key={item}>
+            <Grid item xs={12} sm={6} md={4} key={item}>
               <Box
                 sx={{ height: 250, bgcolor: "action.hover", borderRadius: 1 }}
               />
@@ -147,7 +154,6 @@ export default function Dashboard() {
               xs={12}
               sm={viewMode === "list" ? 12 : 6}
               md={viewMode === "list" ? 12 : 4}
-              lg={viewMode === "list" ? 12 : 3}
               key={trip.id}
             >
               <TripCard
@@ -162,6 +168,6 @@ export default function Dashboard() {
           ))}
         </Grid>
       )}
-    </>
+    </Container>
   );
 }
