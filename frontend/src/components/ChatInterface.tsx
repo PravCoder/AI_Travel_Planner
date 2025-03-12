@@ -12,14 +12,13 @@ import {
 import SendIcon from "@mui/icons-material/Send";
 import SmartToyIcon from "@mui/icons-material/SmartToy";
 import ChatMessage, { ChatMessageProps } from "./ChatMessage";
-import { v4 as uuidv4 } from "uuid";
 
-// Re-export ChatMessageProps as ChatMessage
-export type ChatMessage = ChatMessageProps;
+// Re-export ChatMessageProps as ChatMessageType
+export type ChatMessageType = ChatMessageProps;
 
 // Define props interface
 interface ChatInterfaceProps {
-  messages: ChatMessage[];
+  messages: ChatMessageType[];
   onSendMessage: (message: string) => void;
   isLoading?: boolean;
 }

@@ -12,7 +12,7 @@ import { v4 as uuidv4 } from "uuid";
 import { useSearchParams } from "react-router-dom";
 import { TripParameters } from "../components/CompactTripParameters";
 import CompactTripParameters from "../components/CompactTripParameters";
-import ChatInterface, { ChatMessage } from "../components/ChatInterface";
+import ChatInterface, { ChatMessageType } from "../components/ChatInterface";
 import MapIntegration from "../components/MapIntegration";
 import AddIcon from "@mui/icons-material/Add";
 import SaveIcon from "@mui/icons-material/Save";
@@ -43,8 +43,8 @@ const CreateTripPage: React.FC = () => {
   });
 
   // Chat messages state
-  const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [isLoading, setIsLoading] = useState(false);
+  const [messages, setMessages] = useState<ChatMessageType[]>([]);
 
   // Handle parameter changes
   const handleParameterChange = (newParams: Partial<TripParameters>) => {
@@ -85,7 +85,7 @@ const CreateTripPage: React.FC = () => {
   // Handle sending a message
   const handleSendMessage = (messageText: string) => {
     // Add user message
-    const userMessage: ChatMessage = {
+    const userMessage: ChatMessageType = {
       id: uuidv4(),
       text: messageText,
       sender: "user",
@@ -97,7 +97,7 @@ const CreateTripPage: React.FC = () => {
 
     // Simulate AI response with a simple confirmation
     setTimeout(() => {
-      const aiMessage: ChatMessage = {
+      const aiMessage: ChatMessageType = {
         id: uuidv4(),
         text:
           "Message received! I'll help you plan your trip to " +
@@ -124,7 +124,7 @@ const CreateTripPage: React.FC = () => {
   useEffect(() => {
     const destinationName = tripParameters.location;
 
-    const welcomeMessage: ChatMessage = {
+    const welcomeMessage: ChatMessageType = {
       id: uuidv4(),
       text: destinationName
         ? `Welcome to your travel planner! I see you're interested in visiting ${destinationName}. Let me help you plan your perfect vacation.`
