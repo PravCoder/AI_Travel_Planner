@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import {
   Box,
   Typography,
@@ -27,24 +27,20 @@ import ShareIcon from "@mui/icons-material/Share";
 const CreateTripPage: React.FC = () => {
   const theme = useTheme();
   const [searchParams] = useSearchParams();
-
-  // Get today's date and a date 3 weeks from now for default trip dates
-  const today = new Date();
-  const twoWeeksLater = new Date();
-  twoWeeksLater.setDate(today.getDate() + 14);
+  const hasInitialized = useRef(false);
 
   // Trip parameters state - initialize with URL param if available
   const [tripParameters, setTripParameters] = useState<TripParameters>({
-    location: searchParams.get("destination") || "New Trip",
-    startDate: today,
-    endDate: twoWeeksLater,
-    budget: "medium",
-    travelers: 2,
+    location: searchParams.get("destination") || "",
+    startDate: null,
+    endDate: null,
+    budget: "budget",
+    travelers: 1,
   });
 
   // Chat messages state
-  const [isLoading, setIsLoading] = useState(false);
   const [messages, setMessages] = useState<ChatMessageType[]>([]);
+  const [isLoading, setIsLoading] = useState(false);
 
   // Handle parameter changes
   const handleParameterChange = (newParams: Partial<TripParameters>) => {
@@ -78,6 +74,31 @@ const CreateTripPage: React.FC = () => {
         );
       }
 
+      // Log location changes
+      if (newParams.location && newParams.location !== prev.location) {
+        console.log("Location changed:", newParams.location);
+      }
+
+      // Log date changes
+      if (
+        (newParams.startDate && newParams.startDate !== prev.startDate) ||
+        (newParams.endDate && newParams.endDate !== prev.endDate)
+      ) {
+        const startDateText = newParams.startDate
+          ? newParams.startDate.toLocaleDateString()
+          : prev.startDate?.toLocaleDateString();
+        const endDateText = newParams.endDate
+          ? newParams.endDate.toLocaleDateString()
+          : prev.endDate?.toLocaleDateString();
+
+        console.log("Dates changed:", `${startDateText} - ${endDateText}`);
+      }
+
+      // Log travelers changes
+      if (newParams.travelers && newParams.travelers !== prev.travelers) {
+        console.log("Travelers changed:", newParams.travelers);
+      }
+
       return updated;
     });
   };
@@ -95,14 +116,16 @@ const CreateTripPage: React.FC = () => {
     setMessages((prev) => [...prev, userMessage]);
     setIsLoading(true);
 
-    // Simulate AI response with a simple confirmation
+    // Simulate AI response
     setTimeout(() => {
+      // Create AI response based on the message and parameters
+      const aiResponseText = generateAIResponse(messageText, tripParameters);
+
       const aiMessage: ChatMessageType = {
         id: uuidv4(),
         text:
-          "Message received! I'll help you plan your trip to " +
-          tripParameters.location +
-          ".",
+          aiResponseText ||
+          `I'll help you plan your trip to ${tripParameters.location}. What would you like to know?`,
         sender: "ai",
         timestamp: new Date(),
       };
@@ -117,22 +140,28 @@ const CreateTripPage: React.FC = () => {
     message: string,
     params: TripParameters
   ): string => {
-    return ""; // TODO: Implement AI response generation with OpenAI API
+    // TODO: Implement AI response generation with OpenAI API
+    // The updated parameters are automatically passed in here,
+    // so the AI responses can take into account the current parameters
+    return "";
   };
 
-  // Add a welcome message when the component mounts
+  // Add a welcome message ONLY when the component first mounts
   useEffect(() => {
-    const destinationName = tripParameters.location;
+    if (!hasInitialized.current) {
+      const destinationName = tripParameters.location;
 
-    const welcomeMessage: ChatMessageType = {
-      id: uuidv4(),
-      text: destinationName
-        ? `Welcome to your travel planner! I see you're interested in visiting ${destinationName}. Let me help you plan your perfect vacation.`
-        : "Welcome to your travel planner! Start by setting your trip parameters, then ask me to help you plan your perfect vacation.",
-      sender: "ai",
-      timestamp: new Date(),
-    };
-    setMessages([welcomeMessage]);
+      const welcomeMessage: ChatMessageType = {
+        id: uuidv4(),
+        text: destinationName
+          ? `Welcome to your travel planner! I see you're interested in visiting ${destinationName}. Let me help you plan your perfect vacation.`
+          : "Welcome to your travel planner! Start by setting your trip parameters, then ask me to help you plan your perfect vacation.",
+        sender: "ai",
+        timestamp: new Date(),
+      };
+      setMessages([welcomeMessage]);
+      hasInitialized.current = true;
+    }
   }, [tripParameters.location]);
 
   return (

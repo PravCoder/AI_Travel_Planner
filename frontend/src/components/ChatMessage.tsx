@@ -36,7 +36,7 @@ const ChatMessage: React.FC<ChatMessageProps> = ({
       {/* Avatar */}
       <Avatar
         sx={{
-          bgcolor: isUser ? "primary.main" : "secondary.main",
+          bgcolor: isUser ? "primary.dark" : "secondary.main",
           width: 38,
           height: 38,
         }}
@@ -52,7 +52,7 @@ const ChatMessage: React.FC<ChatMessageProps> = ({
           maxWidth: "75%", // Wider for better readability
           minWidth: "200px",
           bgcolor: isUser
-            ? "primary.main"
+            ? "primary.dark"
             : theme.palette.mode === "dark"
             ? "rgba(60, 60, 60, 0.9)"
             : theme.palette.background.default,
