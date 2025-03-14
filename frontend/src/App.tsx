@@ -1,35 +1,22 @@
-import React from "react";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
-import { CssBaseline } from "@mui/material";
-import DashboardLayout from "./components/DashboardLayout";
-import { CustomThemeProvider } from "./context/ThemeContext";
+import RegisterPage from "./pages/RegisterPage";
+import LoginPage from "./pages/LoginPage";
 import DashboardPage from "./pages/DashboardPage";
-import AboutPage from "./pages/AboutPage";
-
-// Placeholder components for routes
-const Reports = () => <div>Reports Content</div>;
-const Sales = () => <div>Sales Reports Content</div>;
-const Traffic = () => <div>Traffic Reports Content</div>;
-const Integrations = () => <div>Integrations Content</div>;
+import TestPage from "./pages/TestPage";
+import { GoogleOAuthProvider } from '@react-oauth/google';
 
 function App() {
   return (
-    <CustomThemeProvider>
-      <CssBaseline />
-      <Router>
-        <Routes>
-          <Route path="/" element={<DashboardLayout />}>
-            <Route index element={<DashboardPage />} />
-            <Route path="dashboard" element={<DashboardPage />} />
-            <Route path="about" element={<AboutPage />} />
-            <Route path="reports" element={<Reports />} />
-            <Route path="reports/sales" element={<Sales />} />
-            <Route path="reports/traffic" element={<Traffic />} />
-            <Route path="integrations" element={<Integrations />} />
-          </Route>
-        </Routes>
-      </Router>
-    </CustomThemeProvider>
+    <GoogleOAuthProvider clientId="516075917073-kjqp5cjgsn2jl5a3bgijeh8r0bfefvkv.apps.googleusercontent.com">
+    <Router>
+      <Routes>
+        <Route path="/register" element={<RegisterPage />} />
+        <Route path="/login" element={<LoginPage />} />
+        <Route path="/dashboard" element={<DashboardPage/>} />
+        <Route path="/test" element={<TestPage/>} />
+      </Routes>
+    </Router>
+    </GoogleOAuthProvider>
   );
 }
 
