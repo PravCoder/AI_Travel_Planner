@@ -18,7 +18,7 @@ interface ITrip extends Document {
 // define the schema for the Trip
 const TripSchema: Schema<ITrip> = new Schema(
   {
-    title: { type: String, required: true, unique: true },
+    title: { type: String, required: true },
     hours: { type: Date, required: true }, 
     activityType: { type: String, required: true },
     cost: { type: Number, required: true }, 
