@@ -63,7 +63,7 @@ const TripCard: React.FC<TripCardProps> = ({
         <CardActionArea onClick={handleCardClick}>
           <CardMedia
             component="img"
-            height="140"
+            height="200"
             image={trip.imageUrl}
             alt={trip.title}
           />
