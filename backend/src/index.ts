@@ -4,6 +4,7 @@ import mongoose from "mongoose";
 
 // Import routers
 import userRouter from "./routes/user_routes"; 
+import tripRouter from "./routes/trip_routes"
 
 const app = express(); // Create Express app
 app.use(express.json()); // Ensure JSON parsing
@@ -11,6 +12,7 @@ app.use(cors()); // Enable CORS
 
 // Mount routers
 app.use("/user", userRouter); // ✅ This is the correct way to mount `userRouter`
+app.use("/trip", tripRouter);
 
 // Connect to MongoDB
 mongoose
