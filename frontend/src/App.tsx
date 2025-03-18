@@ -5,12 +5,8 @@ import DashboardLayout from "./components/DashboardLayout";
 import { CustomThemeProvider } from "./context/ThemeContext";
 import DashboardPage from "./pages/DashboardPage";
 import AboutPage from "./pages/AboutPage";
-
-// Placeholder components for routes
-const Reports = () => <div>Reports Content</div>;
-const Sales = () => <div>Sales Reports Content</div>;
-const Traffic = () => <div>Traffic Reports Content</div>;
-const Integrations = () => <div>Integrations Content</div>;
+import CreateTripPage from "./pages/CreateTripPage";
+import PopularDestinationsPage from "./pages/PopularDestinationsPage";
 
 function App() {
   return (
@@ -21,11 +17,12 @@ function App() {
           <Route path="/" element={<DashboardLayout />}>
             <Route index element={<DashboardPage />} />
             <Route path="dashboard" element={<DashboardPage />} />
+            <Route path="create-trip" element={<CreateTripPage />} />
             <Route path="about" element={<AboutPage />} />
-            <Route path="reports" element={<Reports />} />
-            <Route path="reports/sales" element={<Sales />} />
-            <Route path="reports/traffic" element={<Traffic />} />
-            <Route path="integrations" element={<Integrations />} />
+            <Route
+              path="popular-destinations"
+              element={<PopularDestinationsPage />}
+            />
           </Route>
         </Routes>
       </Router>

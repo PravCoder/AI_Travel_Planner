@@ -1,6 +1,5 @@
 import React, { useState } from "react";
 import Box from "@mui/material/Box";
-import Container from "@mui/material/Container";
 import { Outlet } from "react-router-dom";
 import AppHeader from "./AppHeader";
 import SideNav from "./SideNav";
@@ -42,9 +41,9 @@ const DashboardLayout: React.FC = () => {
       {/* Main Content */}
       <Box component="main" sx={{ flexGrow: 1, p: 3 }}>
         <DrawerHeader />
-        <Container maxWidth="lg">
+        <Box sx={{ width: "100%" }}>
           <Outlet />
-        </Container>
+        </Box>
       </Box>
     </Box>
   );
