@@ -21,6 +21,8 @@ export default function Dashboard() {
 
   useEffect(() => {
     // In a real app, you would fetch trips from your API
+    const token = localStorage.getItem("jwtToken");
+    console.log(token);
     const fetchTrips = async () => {
       try {
         // Mock data for now

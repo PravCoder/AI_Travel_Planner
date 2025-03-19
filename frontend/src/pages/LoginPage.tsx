@@ -70,19 +70,19 @@ const LoginPage: React.FC = () => {
 
     setIsLoading(true);
     try {
-      const response = await axios.post(
-        "http://localhost:3001/user/login",
-        {
-          email: formData.email,
-          password: formData.password,
-        }
-      );
+      const response = await axios.post("http://localhost:3001/user/login", {
+        email: formData.email,
+        password: formData.password,
+      });
 
-      if (response.data.redirect_now) {
+      const token = response.data.token;
+      localStorage.setItem("jwtToken", token);
+      navigate("/dashboard");
+      /* if (response.data.redirect_now) {
         // Store the token in localStorage or a secure cookie
         localStorage.setItem("userID", response.data.userID);
         navigate("/dashboard"); // Redirect to dashboard after successful login
-      }
+      } */
     } catch (error) {
       if (axios.isAxiosError(error) && error.response) {
         setServerError(error.response.data.message || "Login failed");

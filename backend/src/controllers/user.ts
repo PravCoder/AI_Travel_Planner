@@ -3,6 +3,7 @@ import createHttpError from "http-errors";
 import UserModel from "../models/User";
 import express, { Router, Request, Response } from "express";
 import { hashPassword, verifyPassword } from "../Functions/Password"; // Ensure correct import
+import jwt from 'jsonwebtoken';
 
 
 interface RegisterBody {
@@ -36,6 +37,13 @@ export const registerController = async (req: Request<{}, {}, RegisterBody>, res
 };
 
 
+// login
+const app = express();
+app.use(express.json());
+
+// Secret key for signing JWTs
+const secretKey = 'prav-is-cool';
+
 interface loginBody {
   email: string,
   password: string,
@@ -59,7 +67,9 @@ export const loginController = async (req: Request<{}, {}, loginBody>, res: Resp
       }
       // if email does exist password matches
       else if (passwords_match == true) {
-        res.json({userID:user._id, message:"user successfully logged in", redirect_now: true});
+        const token = jwt.sign({ email }, secretKey, { expiresIn: '1h' });
+        res.json({ token, message:"user successfully logged in", redirect_now: true });
+        // res.json({userID:user._id, message:"user successfully logged in", redirect_now: true});
       }
 
     }
