@@ -9,7 +9,11 @@ import { Types } from "mongoose";
 This route creates a empty trip object, with none of its attributes filled. This route is called when a user clicks the new trip button on the dashabord page.
 As the user chats we will call another route called /update-trip which starts to fill in the attribute of the trip. 
 
-
+Postman Url:  http://localhost:3001/trip/create-trip
+Postman data:
+{
+    "userId":"67dcdde4defea3be5556cc6a"
+}
 */
 tripRouter.post("/create-trip", async(req: Request, res: Response) => {
   try {
