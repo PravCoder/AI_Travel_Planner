@@ -31,9 +31,15 @@ tripRouter.post("/create-trip", async(req: Request, res: Response) => {
 
 
 /* 
-This route updates the tirp object attributes as the user is chatting.
+This route updates the trip object attributes as the user is chatting. For example when
 */
-
+tripRouter.post("/update-trip", async(req: Request, res: Response) => {
+  try {
+    res.status(201).json({ message: "trip updated successfully!" });
+  } catch(eror) {
+    res.status(201).json({ message: "error updating trip" });
+  }
+});
 
     
 export default tripRouter;
