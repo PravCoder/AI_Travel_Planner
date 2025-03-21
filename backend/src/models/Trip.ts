@@ -21,25 +21,25 @@ interface ITrip extends Document {
 // define the schema for the Trip
 const TripSchema: Schema<ITrip> = new Schema(
   {
-    title: { type: String, required: true },
-    startDate: { type: Date, required: true }, 
-    endDate: { type: Date, required: true },
-    numTravelers: { type: Number, required: true }, 
-    budget: { type: Number, required: true }, 
-    currentCost: { type: Number, required: true }, 
-    country: { type: String, required: true }, 
-    city: { type: String, required: true }, 
+    title: { type: String, required: false, default:"Untitled Trip", unique:false },
+    startDate: { type: Date, required: false,unique:false  }, 
+    endDate: { type: Date, required: false, unique:false  },
+    numTravelers: { type: Number, required: false, unique:false  }, 
+    budget: { type: Number, required: false, unique:false  }, 
+    currentCost: { type: Number, required: false, unique:false  }, 
+    country: { type: String, required: false, unique:false  }, 
+    city: { type: String, required: false, unique:false  }, 
     destinations: [{ type: Schema.Types.ObjectId, ref: "Destination" }], 
-    address: { type: String, required: true },
+    address: { type: String, required: false, unique:false  },
     location: {
       type: {
         type: String,
         enum: ['Point'], 
-        required: true
+        required: false
       },
       coordinates: {
         type: [Number],
-        required: true
+        required: false
       }
     },
   },
