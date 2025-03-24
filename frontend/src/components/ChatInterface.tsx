@@ -167,6 +167,13 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({
           disabled={isLoading}
           variant="outlined"
           size="small"
+          name="chatMessageInput"
+          id="chat-message-input"
+          inputProps={{
+            id: "chat-message-textarea",
+            name: "chat-message-textarea",
+            "aria-label": "Type your message",
+          }}
           sx={{
             "& .MuiOutlinedInput-root": {
               borderRadius: 2,
