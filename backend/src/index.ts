@@ -1,12 +1,15 @@
 import cors from "cors";
 import express from "express";
 import mongoose from "mongoose";
+import dotenv from "dotenv";
+dotenv.config(); // Load environment variables
+
 
 // Import routers
 import userRouter from "./routes/user_routes"; 
 
 const app = express(); // Create Express app
-app.use(express.json()); // Ensure JSON parsing
+app.use(express.json({ strict: false }));
 app.use(cors()); // Enable CORS
 
 // Mount routers
