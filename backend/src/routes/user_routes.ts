@@ -40,6 +40,13 @@ async function registerUser(req: Request, res: Response): Promise<void> {
 
 /**
  * Generate AI Travel Itinerary
+ * 
+ * 
+ * Generates a structured travel itinerary using OpenAI's text completion model.
+ * This route expects specific fields in the request body (destination, budget, duration, activities),
+ * and creates a detailed itinerary based on that structured input.
+ * 
+ * Use this for form-driven itinerary generation where the user provides planning info.
  */
 async function generateItinerary(req: Request, res: Response): Promise<void> {
   console.log(" API HIT: /generate-itinerary");
@@ -71,7 +78,38 @@ async function generateItinerary(req: Request, res: Response): Promise<void> {
     console.error(" Error generating itinerary:", error);
     res.status(500).json({ error: "Failed to generate itinerary." });
   }
-}
+} // END generateItinerary
+
+/*
+ * Chat with Open Ai 
+ *
+ *Handles free-form travel-related questions using OpenAI's chat model (gpt-3.5-turbo).
+ * This is a general-purpose chatbot endpoint where users can ask for tips, advice, or info.
+ * 
+ * Use this for conversational travel help, outside of structured itinerary generation.
+ */
+
+async function chatWithOpenAI(req: Request, res: Response): Promise<void> {
+  try {
+    const { message } = req.body;
+
+    if (!message) {
+      return  void res.status(400).json({ error: "Message is required." });
+    }
+
+    const response = await openai.chat.completions.create({
+      model: "gpt-3.5-turbo",
+      messages: [{ role: "user", content: message }],
+    });
+
+    res.json({ reply: response.choices[0].message.content });
+    console.log("OpenAI response: " , response);
+  } catch (error: any) {
+    console.error(" Error calling chat model:", error.message || error);
+    res.status(500).json({ error: "Chat request failed." });
+  }
+} // END CHAT WITH OPEN AI
+
 
 
 
@@ -79,5 +117,6 @@ async function generateItinerary(req: Request, res: Response): Promise<void> {
 // Attach routes to Express router
 userRouter.post("/register", registerUser);
 userRouter.post("/generate-itinerary", generateItinerary);
+userRouter.post("/chat", chatWithOpenAI);
 
 export default userRouter;
