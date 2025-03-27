@@ -43,8 +43,10 @@ export async function conversationalPlanningChat(
         ? 'to ' + new Date(parameters.endDate).toLocaleDateString()
         : ''
     }
-    - Budget: ${parameters.budget || 'Not specified'}
+    - Budget Level: ${parameters.budget ? parameters.budget.charAt(0).toUpperCase() + parameters.budget.slice(1) : 'Not specified'} (1=budget, 2=economy, 3=medium, 4=premium, 5=luxury)
     - Travelers: ${parameters.travelers || 'Not specified'}
+
+    Important: If any of these parameters have changed since the last message, acknowledge the change and adjust your recommendations accordingly.
     
     Your goals:
     - Fill in any missing details (dates, budget, preferences, group size)

@@ -33,15 +33,21 @@ const CreateTripPage: React.FC = () => {
   const [searchParams] = useSearchParams();
   const hasInitialized = useRef(false);
   const chatHistoryRef = useRef<Array<{ role: string; content: string }>>([]);
+  const parameterChangesRef = useRef<string[]>([]); // Track parameter changes for next message
 
   // Trip parameters state - initialize with URL param if available
   const [tripParameters, setTripParameters] = useState<TripParameters>({
     location: searchParams.get("destination") || "",
     startDate: null,
     endDate: null,
-    budget: "budget",
+    budget: "medium",
     travelers: 1,
   });
+
+  // Log initial parameters
+  useEffect(() => {
+    console.log("Initial trip parameters:", tripParameters);
+  }, []);
 
   // Chat messages state
   const [messages, setMessages] = useState<ChatMessageType[]>([]);
@@ -73,6 +79,12 @@ const CreateTripPage: React.FC = () => {
       // Log budget changes specifically
       if ("budget" in newParams && newParams.budget !== undefined) {
         const budgetValue = newParams.budget;
+
+        // Track budget change for next AI request
+        parameterChangesRef.current.push(
+          `My budget has changed to ${budgetValue}. Please adjust your recommendations accordingly.`
+        );
+
         // Map budget string values to their display names
         const budgetDisplayMap: Record<string, string> = {
           budget: "Budget",
@@ -241,9 +253,24 @@ const CreateTripPage: React.FC = () => {
     chatHistoryRef.current.push({ role: "user", content: messageText });
 
     try {
+      // Prepare the message for the backend - include any parameter changes
+      let newMessageText = messageText;
+      if (parameterChangesRef.current.length > 0) {
+        // Append parameter changes to the backend message
+        // These won't be shown in the UI but will be sent to the AI
+        newMessageText = `${messageText}\n\n[System: ${parameterChangesRef.current.join(
+          " "
+        )}]`;
+        // Clear the changes after they've been sent
+        parameterChangesRef.current = [];
+      }
+
+      // Log the parameters being sent
+      console.log("Sending parameters to backend:", tripParameters);
+
       // Call the OpenAI API via our backend
       const response = await axios.post(`${API_BASE_URL}/trip/chat`, {
-        message: messageText,
+        message: newMessageText,
         tripParameters,
         chatHistory: chatHistoryRef.current,
       });
@@ -260,7 +287,7 @@ const CreateTripPage: React.FC = () => {
       // Create and add AI message
       const aiMessage: ChatMessageType = {
         id: uuidv4(),
-        text: aiResponseText,
+        text: `[Your budget is set to ${tripParameters.budget}]. ${aiResponseText}`,
         sender: "ai",
         timestamp: new Date(),
       };
@@ -297,7 +324,7 @@ const CreateTripPage: React.FC = () => {
       const welcomeMessage: ChatMessageType = {
         id: uuidv4(),
         text: destinationName
-          ? `Welcome to your travel planner! I see you're interested in visiting ${destinationName}. Let me help you plan your perfect vacation.`
+          ? `Welcome to your travel planner! I see you're interested in visiting ${destinationName}. Your budget is set to ${tripParameters.budget}. Let me help you plan your perfect vacation.`
           : "Welcome to your travel planner! Start by setting your trip parameters, then ask me to help you plan your perfect vacation.",
         sender: "ai",
         timestamp: new Date(),
