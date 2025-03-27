@@ -1,39 +1,124 @@
-/*  Create backend endpoints related to user model here, like /login & /register  
+import express, { Request, Response, Router } from 'express';
+import OpenAI from 'openai';
+import { hashPassword } from '../functions/Password';
+import UserModel from '../models/User';
 
-1. Need to create a express router called userRouter or something, create a /login endpoint, export that router, and import it in index.js
-2. In index.js import this userRouter and do app.use("/", userRouter);, so you can send requests to the endpoints in this file and test your code.
-*/
+const userRouter: Router = express.Router();
 
-import express, { Request, Response } from "express";
-import mongoose from "mongoose";
-import cors from "cors";
-
-const userRouter = express.Router(); // create a express-router-instance
-
-
-
-/* 
-The interface is just defining the structure of the body of the request that the endpoint recives from the request.
-Postman-url: http://localhost:3001/user/test
-Postman-request-body: 
-{
-  "form_input1": "Apple",
-  "form_input2": "Orange"
-}
-*/
-interface TestRequestBody {form_input1: string; form_input2: string};
-
-userRouter.post("/test", async (req: Request<{}, {}, TestRequestBody>, res: Response) => {  // this accepts a post-request to /test endpoint and does some logic
-
-    const {form_input1, form_input2} = req.body;  // breakdown inputs we recived with the request body
-
-    // do your endpoint logic here
-    console.log("Test Endpoint Data we recvied from frontend form: " + form_input1 + ", " +form_input2);
-    const random_number = Math.random(); // just get a random number and send it back to frontend in the response-json-body
-
-    res.status(201).json({message: "test endpoint was successful", additional_data: random_number}); // send response back to client with a message or additional data
-
+// Initialize OpenAI
+const openai = new OpenAI({
+  apiKey: process.env.OPENAI_API_KEY, // Ensure this is set in your .env file
 });
 
-export default userRouter;
+/**
+ * Register User
+ */
+async function registerUser(req: Request, res: Response): Promise<void> {
+  try {
+    const { username, email, password } = req.body;
 
+    // Check if user exists
+    const existingUser = await UserModel.findOne({ email });
+    if (existingUser) {
+      res.status(400).json({ error: 'User already exists' });
+      return;
+    }
+
+    // Hash the password
+    const hashedPassword = await hashPassword(password);
+
+    // Create and save new user
+    const newUser = new UserModel({
+      username,
+      email,
+      password: hashedPassword,
+    });
+    await newUser.save();
+
+    res.status(201).json({ message: 'User registered successfully!' });
+  } catch (error) {
+    console.error('Error in register route:', error);
+    res.status(500).json({ error: 'Error registering user' });
+  }
+}
+
+/**
+ * Generate AI Travel Itinerary
+ *
+ *
+ * Generates a structured travel itinerary using OpenAI's text completion model.
+ * This route expects specific fields in the request body (destination, budget, duration, activities),
+ * and creates a detailed itinerary based on that structured input.
+ *
+ * Use this for form-driven itinerary generation where the user provides planning info.
+ */
+async function generateItinerary(req: Request, res: Response): Promise<void> {
+  console.log(' API HIT: /generate-itinerary');
+  console.log(' Headers:', req.headers); // Log headers
+  console.log(' Raw Request Body:', req.body); // Log raw request body
+
+  try {
+    const { destination, budget, duration, activities } = req.body;
+
+    if (!destination || !budget || !duration || !activities) {
+      console.error(' Validation Failed: Missing fields in request.');
+      res.status(400).json({ error: 'All fields are required.' });
+      return;
+    }
+
+    console.log(' Validation Passed. Sending request to OpenAI...');
+
+    const prompt = `Generate a ${duration}-day travel itinerary for ${destination} with a budget of ${budget}. Include activities like ${activities.join(
+      ', '
+    )}.`;
+
+    const response = await openai.completions.create({
+      model: 'text-davinci-003',
+      prompt: prompt,
+      max_tokens: 500,
+    });
+
+    console.log('✅ OpenAI Response Received');
+    res.json({ itinerary: response.choices[0].text.trim() });
+  } catch (error) {
+    console.error(' Error generating itinerary:', error);
+    res.status(500).json({ error: 'Failed to generate itinerary.' });
+  }
+} // END generateItinerary
+
+/*
+ * Chat with Open Ai
+ *
+ *Handles free-form travel-related questions using OpenAI's chat model (gpt-3.5-turbo).
+ * This is a general-purpose chatbot endpoint where users can ask for tips, advice, or info.
+ *
+ * Use this for conversational travel help, outside of structured itinerary generation.
+ */
+
+async function chatWithOpenAI(req: Request, res: Response): Promise<void> {
+  try {
+    const { message } = req.body;
+
+    if (!message) {
+      return void res.status(400).json({ error: 'Message is required.' });
+    }
+
+    const response = await openai.chat.completions.create({
+      model: 'gpt-4o-mini-search-preview',
+      messages: [{ role: 'user', content: message }],
+    });
+
+    res.json({ reply: response.choices[0].message.content });
+    console.log('OpenAI response: ', response);
+  } catch (error: any) {
+    console.error(' Error calling chat model:', error.message || error);
+    res.status(500).json({ error: 'Chat request failed.' });
+  }
+} // END CHAT WITH OPEN AI
+
+// Attach routes to Express router
+userRouter.post('/register', registerUser);
+userRouter.post('/generate-itinerary', generateItinerary);
+userRouter.post('/chat', chatWithOpenAI);
+
+export default userRouter;

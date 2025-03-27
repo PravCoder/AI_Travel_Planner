@@ -7,6 +7,8 @@ import DashboardPage from "./pages/DashboardPage";
 import AboutPage from "./pages/AboutPage";
 import CreateTripPage from "./pages/CreateTripPage";
 import PopularDestinationsPage from "./pages/PopularDestinationsPage";
+import ChatPage from "./pages/ChatPage";
+
 
 function App() {
   return (
@@ -18,6 +20,7 @@ function App() {
             <Route index element={<DashboardPage />} />
             <Route path="dashboard" element={<DashboardPage />} />
             <Route path="create-trip" element={<CreateTripPage />} />
+            <Route path="chat" element={<ChatPage />} />
             <Route path="about" element={<AboutPage />} />
             <Route
               path="popular-destinations"

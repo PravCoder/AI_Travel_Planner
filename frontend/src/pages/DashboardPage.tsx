@@ -7,6 +7,7 @@ import {
   ButtonGroup,
   Grid,
   Container,
+  Paper,
 } from "@mui/material";
 import ViewModuleIcon from "@mui/icons-material/ViewModule";
 import ViewListIcon from "@mui/icons-material/ViewList";
@@ -14,6 +15,7 @@ import AddIcon from "@mui/icons-material/Add";
 import TripCard from "../components/TripCard";
 import { Trip } from "../types/trip";
 import { useNavigate } from "react-router-dom";
+import Chat from "../components/Chat";
 
 const DashboardHeader = styled(Box)(({ theme }) => ({
   display: "flex",
@@ -29,10 +31,8 @@ export default function Dashboard() {
   const navigate = useNavigate();
 
   useEffect(() => {
-    // In a real app, you would fetch trips from your API
     const fetchTrips = async () => {
       try {
-        // Mock data for now
         const mockTrips: Trip[] = [
           {
             id: "1",
@@ -77,8 +77,6 @@ export default function Dashboard() {
   }, []);
 
   const handleAddTrip = () => {
-    // Navigate to trip creation page
-    console.log("Add new trip");
     navigate("/create-trip");
   };
 
@@ -95,12 +93,10 @@ export default function Dashboard() {
   };
 
   const handleEditTrip = (tripId: string) => {
-    // Navigate to trip edit page
     console.log("Edit trip:", tripId);
   };
 
   const handleShareTrip = (tripId: string) => {
-    // Open share dialog
     console.log("Share trip:", tripId);
   };
 
@@ -168,6 +164,14 @@ export default function Dashboard() {
           ))}
         </Grid>
       )}
+
+      {/* 👇 Chat section added below the trips */}
+      <Paper elevation={3} sx={{ mt: 6, p: 3 }}>
+        <Typography variant="h5" gutterBottom>
+          Need help planning your next trip?
+        </Typography>
+        <Chat />
+      </Paper>
     </Container>
   );
 }
