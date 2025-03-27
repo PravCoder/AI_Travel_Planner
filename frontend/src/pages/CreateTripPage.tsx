@@ -9,18 +9,21 @@ import {
   Paper,
   Typography,
   useTheme,
-} from '@mui/material';
-import axios from 'axios';
-import React, { useCallback, useEffect, useRef, useState } from 'react';
-import { useSearchParams } from 'react-router-dom';
-import { v4 as uuidv4 } from 'uuid';
-import ChatInterface, { ChatMessageType } from '../components/ChatInterface';
-import CompactTripParameters, {
-  TripParameters,
-} from '../components/CompactTripParameters';
-import MapIntegration from '../components/MapIntegration';
+} from "@mui/material";
+import { v4 as uuidv4 } from "uuid";
+import { useSearchParams } from "react-router-dom";
+import { TripParameters } from "../components/CompactTripParameters";
+import CompactTripParameters from "../components/CompactTripParameters";
+import ChatInterface, { ChatMessageType } from "../components/ChatInterface";
+import MapIntegration from "../components/MapIntegration";
+import FormatListBulletedIcon from "@mui/icons-material/FormatListBulleted";
+import SaveIcon from "@mui/icons-material/Save";
+import ShareIcon from "@mui/icons-material/Share";
+import ItineraryDrawer from "../components/ItineraryDrawer";
+import axios from "axios";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 
-const API_BASE_URL = 'http://localhost:3001'; // Use localhost for development
+const API_BASE_URL = "http://localhost:3001"; // Use localhost for development
 
 /**
  * CreateTripPage Component
@@ -50,6 +53,20 @@ const CreateTripPage: React.FC = () => {
 
   // TODO: might want to allow the chatbot to modify trip parameters if it gains new info through the chat
   // (e.g., if the user mentions a specific date or budget preference that differs from the initial input)
+
+  // Itinerary drawer state
+  const [drawerOpen, setDrawerOpen] = useState(false);
+  const [drawerSide, setDrawerSide] = useState<"left" | "right">("right");
+
+  // Function to collapse sidebar - this will be passed to the ItineraryDrawer
+  const handleCollapseSidebar = () => {
+    // This function will need to communicate with the app layout/sidebar component
+    // We'll use a custom event to trigger the sidebar collapse
+    const event = new CustomEvent("collapse-sidebar");
+    window.dispatchEvent(event);
+
+    console.log("Collapsing sidebar for better drawer visibility");
+  };
 
   // Handle parameter changes
   const handleParameterChange = (newParams: Partial<TripParameters>) => {
@@ -300,6 +317,16 @@ const CreateTripPage: React.FC = () => {
     }
   }, [tripParameters.location]);
 
+  // Handle toggle drawer open/close
+  const toggleDrawer = () => {
+    setDrawerOpen(!drawerOpen);
+  };
+
+  // Handle drawer position change from the drawer component
+  const handleDrawerSideChange = (side: "left" | "right") => {
+    setDrawerSide(side);
+  };
+    
   // Listen for when user is ready to generate trip plan
   useEffect(() => {
     if (isReadyForPlanning) {
@@ -341,8 +368,9 @@ const CreateTripPage: React.FC = () => {
         flexDirection: 'column',
         padding: 0,
         margin: 0,
-        maxWidth: '100%',
-        overflow: 'hidden',
+        maxWidth: "100%",
+        overflow: "hidden",
+        position: "relative",
       }}
     >
       {/* Header with trip title and parameters */}
@@ -356,6 +384,8 @@ const CreateTripPage: React.FC = () => {
           alignItems: 'center',
           borderRadius: 2,
           bgcolor: theme.palette.background.paper,
+          position: "relative",
+          zIndex: 10,
         }}
       >
         <Typography variant="h5" component="h1" fontWeight="bold">
@@ -386,11 +416,22 @@ const CreateTripPage: React.FC = () => {
           flexGrow: 1,
           overflow: 'hidden',
           m: 0,
-          width: '100%',
+          width: "100%",
+          position: "relative",
+          zIndex: 5,
         }}
       >
         {/* Itinerary Panel */}
-        <Grid size={{ xs: 12, md: 6 }} sx={{ height: '100%', pr: 1 }}>
+        <Grid
+          item
+          xs={12}
+          md={6}
+          sx={{
+            height: "100%",
+            pr: 1,
+            position: "relative",
+          }}
+        >
           <Paper
             elevation={2}
             sx={{
@@ -416,9 +457,14 @@ const CreateTripPage: React.FC = () => {
               <Typography variant="h6" component="h2">
                 Trip Itinerary
               </Typography>
-              <IconButton size="small">
-                <AddIcon />
-              </IconButton>
+              <Button
+                variant="contained"
+                size="small"
+                onClick={toggleDrawer}
+                startIcon={<FormatListBulletedIcon />}
+              >
+                {"Itinerary"}
+              </Button>
             </Box>
             <Box
               sx={{
@@ -446,13 +492,34 @@ const CreateTripPage: React.FC = () => {
         </Grid>
 
         {/* Map Section */}
-        <Grid size={{ xs: 12, md: 6 }} sx={{ height: '100%', pl: 1 }}>
+        <Grid
+          item
+          xs={12}
+          md={6}
+          sx={{
+            height: "100%",
+            pl: 1,
+            display: {
+              xs: drawerOpen && drawerSide === "right" ? "none" : "block",
+              md: "block",
+            },
+          }}
+        >
           <MapIntegration
             location={tripParameters.location || ''}
             onLocationSelect={(loc) => handleParameterChange({ location: loc })}
           />
         </Grid>
       </Grid>
+
+      {/* Itinerary Drawer - overlays the content */}
+      <ItineraryDrawer
+        open={drawerOpen}
+        onClose={toggleDrawer}
+        tripParameters={tripParameters}
+        onSideChange={handleDrawerSideChange}
+        onCollapseSidebar={handleCollapseSidebar}
+      />
     </Box>
   );
 };

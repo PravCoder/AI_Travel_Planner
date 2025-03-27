@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Box from "@mui/material/Box";
 import { Outlet } from "react-router-dom";
 import AppHeader from "./AppHeader";
@@ -25,6 +25,21 @@ const DashboardLayout: React.FC = () => {
   const handleDrawerClose = () => {
     setOpen(false);
   };
+
+  // Listen for collapse-sidebar event
+  useEffect(() => {
+    const handleCollapseSidebar = () => {
+      setOpen(false);
+    };
+
+    // Add event listener
+    window.addEventListener("collapse-sidebar", handleCollapseSidebar);
+
+    // Clean up when component unmounts
+    return () => {
+      window.removeEventListener("collapse-sidebar", handleCollapseSidebar);
+    };
+  }, []);
 
   return (
     <Box sx={{ display: "flex", minHeight: "100vh" }}>
