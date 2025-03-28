@@ -24,7 +24,7 @@ jest.mock('openai', () => {
 });
 
 describe('OpenAI Service', () => {
-  let mockOpenAI;
+  let mockOpenAI: OpenAI;
 
   beforeEach(() => {
     // Reset mocks before each test
