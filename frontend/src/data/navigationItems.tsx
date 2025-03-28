@@ -3,6 +3,7 @@ import DashboardIcon from "@mui/icons-material/Dashboard";
 import QuestionMarkIcon from "@mui/icons-material/QuestionMark";
 import ExploreIcon from "@mui/icons-material/Explore";
 import { NavigationItem } from "../components/SideNav";
+import LayersIcon from "@mui/icons-material/Layers";
 
 // Define the navigation items for the sidebar
 const navigationItems: NavigationItem[] = [
@@ -20,6 +21,11 @@ const navigationItems: NavigationItem[] = [
     text: "Popular Destinations",
     icon: <ExploreIcon />,
     path: "/popular-destinations",
+  },
+  {
+    text: "Schedule",
+    icon: <LayersIcon />,
+    path: "/schedule",
   },
 ];
 
