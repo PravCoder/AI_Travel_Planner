@@ -224,6 +224,30 @@ const SideNav: React.FC<SideNavProps> = ({
             />
           </ListItemButton>
         </ListItem>
+        <ListItem disablePadding sx={{ display: "block" }}>
+          <ListItemButton
+            sx={{
+              minHeight: 48,
+              justifyContent: open ? "initial" : "center",
+              px: 2.5,
+            }}
+            onClick={() => navigate(navigationItems[3].path)}
+          >
+            <ListItemIcon
+              sx={{
+                minWidth: 0,
+                mr: open ? 3 : "auto",
+                justifyContent: "center",
+              }}
+            >
+              {navigationItems[3].icon}
+            </ListItemIcon>
+            <ListItemText
+              primary={navigationItems[3].text}
+              sx={{ opacity: open ? 1 : 0 }}
+            />
+          </ListItemButton>
+        </ListItem>
       </List>
 
       {/* Profile Menu at the bottom */}
