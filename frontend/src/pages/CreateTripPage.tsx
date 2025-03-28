@@ -267,6 +267,7 @@ const CreateTripPage: React.FC = () => {
 
     try {
       // Prepare the message for the backend - include any parameter changes
+      // UNIT TEST START
       let newMessageText = messageText;
       if (parameterChangesRef.current.length > 0) {
         // Append parameter changes to the backend message
@@ -292,11 +293,6 @@ const CreateTripPage: React.FC = () => {
       const aiResponseText = response.data.reply;
       const isReady = response.data.isReadyForPlanning;
 
-      // Update planning readiness if needed
-      if (isReady) {
-        setIsReadyForPlanning(true);
-      }
-
       // Create and add AI message
       const aiMessage: ChatMessageType = {
         id: uuidv4(),
@@ -304,6 +300,12 @@ const CreateTripPage: React.FC = () => {
         sender: "ai",
         timestamp: new Date(),
       };
+      // UNIT TEST END
+
+      // Update planning readiness if needed
+      if (isReady) {
+        setIsReadyForPlanning(true);
+      }
 
       setMessages((prev) => [...prev, aiMessage]);
 
@@ -435,7 +437,9 @@ const CreateTripPage: React.FC = () => {
           onParametersChange={handleParameterChange}
         />
         <FormControlLabel
-          control={<Checkbox checked={noBudget} onChange={handleNoBudgetChange} />}
+          control={
+            <Checkbox checked={noBudget} onChange={handleNoBudgetChange} />
+          }
           label="No Budget"
           sx={{ ml: 1 }}
         />
