@@ -26,7 +26,6 @@ import HotelIcon from "@mui/icons-material/Hotel";
 import LocationOnIcon from "@mui/icons-material/LocationOn";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import ExpandLessIcon from "@mui/icons-material/ExpandLess";
-import DrawerHeader from "./DrawerHeader";
 import { TripParameters } from "./CompactTripParameters";
 
 interface ItineraryDrawerProps {

@@ -30,11 +30,11 @@ export async function conversationalPlanningChat(
     role: 'system',
     content: `You are a conversational AI assistant helping someone plan a trip.
 
-    Your job is to gather trip preferences in a natural, friendly conversation. Keep replies brief (2-3 sentences max), and focus on asking thoughtful questions that help clarify what the traveler wants.
-    
-    You already know:
-    - Destination: ${parameters.location || 'Not specified'}
-    - Dates: ${
+Your job is to gather trip preferences in a natural, friendly conversation. Keep replies brief (2-3 sentences max), and focus on asking thoughtful questions that help clarify what the traveler wants.
+
+You already know:
+- Destination: ${parameters.location || 'Not specified'}
+- Dates: ${
       parameters.startDate
         ? new Date(parameters.startDate).toLocaleDateString()
         : 'Not specified'
@@ -43,17 +43,24 @@ export async function conversationalPlanningChat(
         ? 'to ' + new Date(parameters.endDate).toLocaleDateString()
         : ''
     }
-    - Budget Level: ${parameters.budget ? parameters.budget.charAt(0).toUpperCase() + parameters.budget.slice(1) : 'Not specified'} (1=budget, 2=economy, 3=medium, 4=premium, 5=luxury)
-    - Travelers: ${parameters.travelers || 'Not specified'}
-    
-    Your goals:
-    - Fill in any missing details (dates, budget, preferences, group size)
-    - Help the user reflect on what kind of trip they want (pace, interests, vibe)
-    - Ask open-ended or multiple-choice questions to inspire the user
-    
-    Don't give a full itinerary. When you feel ready to create a full trip plan, say so and ask if they'd like you to do that.
-    
-    Keep your tone warm, concise, and curious—like a smart friend helping plan an awesome trip.`,
+- Budget Level: ${
+      parameters.budget
+        ? parameters.budget.charAt(0).toUpperCase() + parameters.budget.slice(1)
+        : 'Not specified'
+    } (1=budget, 2=economy, 3=medium, 4=premium, 5=luxury)
+- Travelers: ${parameters.travelers || 'Not specified'}
+
+Your goals:
+- Fill in any missing details (dates, budget, preferences, group size)
+- Help the user reflect on what kind of trip they want (pace, interests, vibe)
+- Ask open-ended or multiple-choice questions to inspire the user
+
+Don't give a full itinerary. When you feel ready to create a full trip plan, use exactly one of these phrases:
+- "I think I have enough information to create your trip plan now. Would you like me to generate it?"
+- "Based on what you've shared, I can create your trip plan. Should I go ahead?"
+- "I have all the details I need for your trip plan. Ready to see it?"
+
+Keep your tone warm, concise, and curious—like a smart friend helping plan an awesome trip.`,
   };
 
   // Build the complete messages array
@@ -77,10 +84,9 @@ export async function conversationalPlanningChat(
 
   // Check if the AI is indicating readiness to generate a trip plan
   const readinessIndicators = [
-    /I(('|')?ve|have) gathered enough information/i,
-    /I(('|')?m| am) ready to (create|generate|build|prepare) (a|your|an|the) (complete |detailed |full |)(itinerary|trip plan|travel plan)/i,
-    /Would you like me to (create|generate|build|prepare) (a|your|an|the) (complete |detailed |full |)(itinerary|trip plan|travel plan)/i,
-    /ready to see your (complete |detailed |full |)(itinerary|trip plan|travel plan)/i,
+    /I think I have enough information to create your trip plan now/i,
+    /Based on what you've shared, I can create your trip plan/i,
+    /I have all the details I need for your trip plan/i,
   ];
 
   const isReadyForPlanning = readinessIndicators.some((indicator) =>
