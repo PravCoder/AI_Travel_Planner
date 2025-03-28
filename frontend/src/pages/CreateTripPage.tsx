@@ -42,6 +42,7 @@ const CreateTripPage: React.FC = () => {
     endDate: null,
     budget: "medium",
     travelers: 1,
+    rapidSuggestions: false
   });
 
   // Log initial parameters
@@ -136,6 +137,17 @@ const CreateTripPage: React.FC = () => {
 
       return updated;
     });
+  };
+
+  // Handle rapid suggestions change
+  const handleRapidSuggestionsChange = () => {
+    const message: ChatMessageType = {
+      id: uuidv4(),
+      text: "Here is a list of trip options!",
+      sender: "ai",
+      timestamp: new Date(),
+    };
+    setMessages((prev) => [...prev, message]);
   };
 
   // Format trip plan for display in chat
@@ -420,6 +432,7 @@ const CreateTripPage: React.FC = () => {
         <CompactTripParameters
           parameters={tripParameters}
           onParametersChange={handleParameterChange}
+          onRapidSuggestionsChange={handleRapidSuggestionsChange}
         />
 
         <Box sx={{ display: "flex", gap: 1 }}>

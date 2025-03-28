@@ -15,6 +15,7 @@ import {
   MenuItem,
   Stack,
   SelectChangeEvent,
+  Checkbox,
 } from "@mui/material";
 import { DatePicker, LocalizationProvider } from "@mui/x-date-pickers";
 import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFnsV3";
@@ -30,12 +31,14 @@ export interface TripParameters {
   endDate: Date | null;
   budget: string;
   travelers: number;
+  rapidSuggestions?: boolean;
 }
 
 // Component props
 export interface CompactTripParametersProps {
   parameters: TripParameters;
   onParametersChange: (params: Partial<TripParameters>) => void;
+  onRapidSuggestionsChange?: () => void;
 }
 
 /**
@@ -47,6 +50,7 @@ export interface CompactTripParametersProps {
 const CompactTripParameters: React.FC<CompactTripParametersProps> = ({
   parameters,
   onParametersChange,
+  onRapidSuggestionsChange,
 }) => {
   // State for popover anchors
   const [locationAnchorEl, setLocationAnchorEl] = useState<HTMLElement | null>(
@@ -381,6 +385,29 @@ const CompactTripParameters: React.FC<CompactTripParametersProps> = ({
           </Box>
         </Box>
       </Popover>
+
+      <Divider orientation="vertical" flexItem sx={{ height: 20 }} />
+
+      {/* Rapid Suggestions Checkbox */}
+      <Box sx={{ display: "flex", alignItems: "center", ml: 1 }}>
+        <FormControl>
+          <Box sx={{ display: 'flex', alignItems: 'center' }}>
+            <Checkbox
+              checked={parameters.rapidSuggestions || false}
+              onChange={(e) => {
+                onParametersChange({ rapidSuggestions: e.target.checked });
+                if (e.target.checked && onRapidSuggestionsChange) {
+                  onRapidSuggestionsChange();
+                }
+              }}
+              size="small"
+            />
+            <Typography variant="body2" sx={{ whiteSpace: 'nowrap' }}>
+              Rapid Suggestions
+            </Typography>
+          </Box>
+        </FormControl>
+      </Box>
     </Paper>
   );
 };
