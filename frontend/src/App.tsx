@@ -8,6 +8,7 @@ import AboutPage from "./pages/AboutPage";
 import CreateTripPage from "./pages/CreateTripPage";
 import PopularDestinationsPage from "./pages/PopularDestinationsPage";
 import ChatPage from "./pages/ChatPage";
+import Schedule from "./components/Schedule/Schedule";
 
 
 function App() {
@@ -26,6 +27,7 @@ function App() {
               path="popular-destinations"
               element={<PopularDestinationsPage />}
             />
+            <Route path="schedule" element={<Schedule />} />
           </Route>
         </Routes>
       </Router>
