@@ -1,6 +1,8 @@
 import {
   Box,
   Button,
+  FormControlLabel,
+  Checkbox,
   Grid,
   IconButton,
   Paper,
@@ -44,6 +46,9 @@ const CreateTripPage: React.FC = () => {
     travelers: 1,
   });
 
+  // Add state for no budget checkbox
+  const [noBudget, setNoBudget] = useState(false);
+
   // Log initial parameters
   useEffect(() => {
     console.log("Initial trip parameters:", tripParameters);
@@ -69,6 +74,14 @@ const CreateTripPage: React.FC = () => {
     window.dispatchEvent(event);
 
     console.log("Collapsing sidebar for better drawer visibility");
+  };
+
+  // Handle no budget checkbox change
+  const handleNoBudgetChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const isNoBudget = event.target.checked;
+    setNoBudget(isNoBudget);
+    // Set budget to luxury when no budget is checked
+    handleParameterChange({ budget: isNoBudget ? "luxury" : "medium" });
   };
 
   // Handle parameter changes
@@ -420,6 +433,11 @@ const CreateTripPage: React.FC = () => {
         <CompactTripParameters
           parameters={tripParameters}
           onParametersChange={handleParameterChange}
+        />
+        <FormControlLabel
+          control={<Checkbox checked={noBudget} onChange={handleNoBudgetChange} />}
+          label="No Budget"
+          sx={{ ml: 1 }}
         />
 
         <Box sx={{ display: "flex", gap: 1 }}>

@@ -1,6 +1,6 @@
 import express, { Request, Response, Router } from 'express';
 import OpenAI from 'openai';
-import { hashPassword } from '../functions/Password';
+import { hashPassword } from '../Functions/Password';
 import UserModel from '../models/User';
 
 const userRouter: Router = express.Router();

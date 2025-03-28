@@ -15,6 +15,8 @@ import {
   InputLabel,
   Select,
   SelectChangeEvent,
+  FormControlLabel,
+  Checkbox,
 } from "@mui/material";
 import { DatePicker } from "@mui/x-date-pickers/DatePicker";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
@@ -190,6 +192,11 @@ const TripParametersBar: React.FC<TripParametersBarProps> = ({
           label={getBudgetDisplay()}
           onClick={(e) => handlePopoverOpen(e, setBudgetAnchorEl)}
           color="primary"
+        />
+        <FormControlLabel
+          control={<Checkbox />}
+          label="No Budget"
+          sx={{ ml: 1 }}
         />
         <Popover
           open={Boolean(budgetAnchorEl)}

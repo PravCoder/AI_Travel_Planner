@@ -43,7 +43,7 @@ export async function conversationalPlanningChat(
         ? 'to ' + new Date(parameters.endDate).toLocaleDateString()
         : ''
     }
-    - Budget Level: ${parameters.budget ? parameters.budget.charAt(0).toUpperCase() + parameters.budget.slice(1) : 'Not specified'} (1=budget, 2=economy, 3=medium, 4=premium, 5=luxury)
+    - Budget Level: ${parameters.budget === 'luxury' ? 'Unlimited (Luxury)' : parameters.budget ? parameters.budget.charAt(0).toUpperCase() + parameters.budget.slice(1) : 'Not specified'} (1=budget, 2=economy, 3=medium, 4=premium, 5=luxury)
     - Travelers: ${parameters.travelers || 'Not specified'}
 
     Important: If any of these parameters have changed since the last message, acknowledge the change and adjust your recommendations accordingly.
@@ -52,6 +52,7 @@ export async function conversationalPlanningChat(
     - Fill in any missing details (dates, budget, preferences, group size)
     - Help the user reflect on what kind of trip they want (pace, interests, vibe)
     - Ask open-ended or multiple-choice questions to inspire the user
+    - For unlimited budget trips, feel free to suggest luxury experiences and high-end options
     
     Don't give a full itinerary. When you feel ready to create a full trip plan, say so and ask if they'd like you to do that.
     
