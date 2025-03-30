@@ -5,7 +5,7 @@ import mongoose from 'mongoose';
 dotenv.config(); // Load environment variables
 
 // Import routers
-import tripRouter from './routes/tripRoutes';
+import tripRouter from './routes/trip_routes';
 import userRouter from './routes/user_routes';
 
 const app = express(); // Create Express app
