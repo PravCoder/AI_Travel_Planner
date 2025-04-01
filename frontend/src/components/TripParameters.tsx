@@ -33,18 +33,18 @@ export interface TripParameters {
 }
 
 // Component props
-export interface CompactTripParametersProps {
+export interface TripParametersProps {
   parameters: TripParameters;
   onParametersChange: (params: Partial<TripParameters>) => void;
 }
 
 /**
- * CompactTripParameters Component
+ * TripParameters Component
  *
- * A compact, centered parameters bar with clickable sections
+ * A centered parameters bar with clickable sections
  * that open popover editors for each parameter
  */
-const CompactTripParameters: React.FC<CompactTripParametersProps> = ({
+const TripParameters: React.FC<TripParametersProps> = ({
   parameters,
   onParametersChange,
 }) => {
@@ -385,4 +385,4 @@ const CompactTripParameters: React.FC<CompactTripParametersProps> = ({
   );
 };
 
-export default CompactTripParameters;
+export default TripParameters;

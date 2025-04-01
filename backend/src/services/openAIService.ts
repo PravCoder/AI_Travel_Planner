@@ -76,7 +76,7 @@ Keep your tone warm, concise, and curious—like a smart friend helping plan an 
 
   // Call OpenAI with the specified model
   const response = await openai.chat.completions.create({
-    model: 'gpt-4o-mini-search-preview',
+    model: "gpt-4o-mini",
     messages,
   });
 
@@ -189,9 +189,9 @@ export async function generateStructuredTripPlan(
 
   // Call OpenAI with the specified model and JSON response format
   const response = await openai.chat.completions.create({
-    model: 'gpt-4o-mini-search-preview',
+    model: "gpt-4o-mini",
     messages,
-    response_format: { type: 'json_object' },
+    response_format: { type: "json_object" },
   });
 
   const content = response.choices[0].message.content;
