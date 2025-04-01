@@ -20,6 +20,11 @@ userRouter.post("/register", UserController.registerController);
 */
 userRouter.post("/login", UserController.loginController);
 
+/**
+ * Refresh Token Route
+*/
+userRouter.post("/refresh-token", UserController.refreshTokenController);
+
 
 /*
  * POSTMAN REQUEST URL: http://localhost:3001/user/register

@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import axios from "axios";
 import "../styles/LoginPage.css";
+import { TokenHelper } from "../utils/TokenHelper";
 
 // Define the shape of the form data
 interface FormData {
@@ -76,7 +77,7 @@ const LoginPage: React.FC = () => {
       });
 
       const token = response.data.token;
-      localStorage.setItem("jwtToken", token);
+      TokenHelper.setToken(token);
       navigate("/dashboard");
       /* if (response.data.redirect_now) {
         // Store the token in localStorage or a secure cookie

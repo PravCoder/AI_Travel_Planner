@@ -1,15 +1,22 @@
-import React from 'react';
-import { Navigate, useLocation } from 'react-router-dom';
+import React from "react";
+import { Navigate, useLocation } from "react-router-dom";
+import { TokenHelper } from "../utils/TokenHelper";
 
 const ProtectedRoute = ({ children }: { children: JSX.Element }) => {
-    const token = localStorage.getItem('jwtToken');
-    const location = useLocation();
+  console.log("ProtectedRoute: Checking token...");
+  const token = TokenHelper.getToken();
+  const location = useLocation();
 
-    if (!token) {
-        return <Navigate to="/login" state={{ from: location }} replace />;
-    }
+  if (!token || (token && TokenHelper.isTokenExpired(token))) {
+    console.log(
+      "ProtectedRoute: Token invalid or expired, redirecting to login"
+    );
+    TokenHelper.removeToken();
+    return <Navigate to="/login" state={{ from: location }} replace />;
+  }
 
-    return children;
+  console.log("ProtectedRoute: Token valid, rendering protected content");
+  return children;
 };
 
 export default ProtectedRoute;

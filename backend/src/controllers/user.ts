@@ -78,3 +78,23 @@ export const loginController = async (req: Request<{}, {}, loginBody>, res: Resp
     res.status(500).json({ error: "Error logining user" });
   }
 }
+
+interface RefreshTokenBody {
+  token: string;
+}
+
+export const refreshTokenController = async (req: Request<{}, {}, RefreshTokenBody>, res: Response): Promise<void> => {
+  try {
+    const { token } = req.body;
+
+    // Verify the existing token
+    const decoded = jwt.verify(token, secretKey) as { email: string };
+    
+    // Generate a new token
+    const newToken = jwt.sign({ email: decoded.email }, secretKey, { expiresIn: '1h' });
+    
+    res.json({ token: newToken });
+  } catch (error) {
+    res.status(401).json({ error: "Invalid token", message: "Token is invalid or expired" });
+  }
+};
