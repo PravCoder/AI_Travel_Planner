@@ -47,6 +47,7 @@ const CreateTripPage: React.FC = () => {
   // Itinerary drawer state
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [drawerSide, setDrawerSide] = useState<"left" | "right">("right");
+  const [tripPlan, setTripPlan] = useState<any>(null);
 
   // Function to collapse sidebar - this will be passed to the ItineraryDrawer
   const handleCollapseSidebar = () => {
@@ -181,6 +182,9 @@ const CreateTripPage: React.FC = () => {
       // Process the trip plan response
       console.log("Generated trip plan:", response.data);
 
+      // Store the trip plan data in state
+      setTripPlan(response.data);
+
       // Add success message
       const successMessage: ChatMessageType = {
         id: uuidv4(),
@@ -200,6 +204,9 @@ const CreateTripPage: React.FC = () => {
       };
 
       setMessages((prev) => [...prev, successMessage, tripSummaryMessage]);
+
+      // Open the itinerary drawer to show the plan
+      setDrawerOpen(true);
     } catch (error) {
       console.error("Error generating trip plan:", error);
 
@@ -509,6 +516,7 @@ const CreateTripPage: React.FC = () => {
         tripParameters={tripParameters}
         onSideChange={handleDrawerSideChange}
         onCollapseSidebar={handleCollapseSidebar}
+        tripPlan={tripPlan}
       />
     </Box>
   );

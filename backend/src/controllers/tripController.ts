@@ -59,6 +59,8 @@ export const generateTripPlan = async (req: Request, res: Response): Promise<voi
       res.status(400).json({ error: 'Trip parameters with location are required' });
       return;
     }
+
+    console.log("Trip parameters exist (past 400 error check)");
     
     // Generate trip plan with OpenAI
     const tripPlanData = await generateStructuredTripPlan(

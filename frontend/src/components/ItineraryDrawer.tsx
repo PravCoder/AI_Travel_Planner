@@ -26,7 +26,36 @@ import HotelIcon from "@mui/icons-material/Hotel";
 import LocationOnIcon from "@mui/icons-material/LocationOn";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import ExpandLessIcon from "@mui/icons-material/ExpandLess";
+import DirectionsCarIcon from "@mui/icons-material/DirectionsCar";
+import ExploreIcon from "@mui/icons-material/Explore";
 import { TripParameters } from "./TripParameters";
+
+// Add interface for the trip plan data matching the OpenAI response
+interface TripPlanActivity {
+  name: string;
+  description: string;
+  location: string;
+  category: string;
+  price: number;
+  tags: string[];
+}
+
+interface TripPlanDay {
+  date: string;
+  activities: TripPlanActivity[];
+  notes?: string;
+}
+
+interface TripPlan {
+  destination: string;
+  startDate: string | null;
+  endDate: string | null;
+  days: TripPlanDay[];
+  budget: string;
+  travelers: number;
+  summary: string;
+  tags: string[];
+}
 
 interface ItineraryDrawerProps {
   open: boolean;
@@ -34,6 +63,7 @@ interface ItineraryDrawerProps {
   tripParameters: TripParameters;
   onSideChange?: (side: "left" | "right") => void;
   onCollapseSidebar?: () => void;
+  tripPlan?: TripPlan; // Add tripPlan prop
 }
 
 // Activity type with category for icons
@@ -71,13 +101,69 @@ const ItineraryDrawer: React.FC<ItineraryDrawerProps> = ({
   tripParameters,
   onSideChange,
   onCollapseSidebar,
+  tripPlan,
 }) => {
   const theme = useTheme();
   const [drawerSide, setDrawerSide] = useState<"left" | "right">("right");
-  const [expandedDays, setExpandedDays] = useState<Record<number, boolean>>({
-    1: true,
-    2: true,
-  });
+  const [expandedDays, setExpandedDays] = useState<Record<number, boolean>>({});
+
+  // Map OpenAI category to our icons
+  const mapCategoryToIcon = (category: string): ActivityCategory => {
+    const lowerCategory = category.toLowerCase();
+    if (
+      lowerCategory.includes("food") ||
+      lowerCategory.includes("restaurant") ||
+      lowerCategory.includes("dining") ||
+      lowerCategory.includes("cafe") ||
+      lowerCategory.includes("breakfast") ||
+      lowerCategory.includes("lunch") ||
+      lowerCategory.includes("dinner")
+    ) {
+      return "food";
+    } else if (
+      lowerCategory.includes("hotel") ||
+      lowerCategory.includes("accommodation") ||
+      lowerCategory.includes("stay") ||
+      lowerCategory.includes("lodging") ||
+      lowerCategory.includes("resort")
+    ) {
+      return "accommodation";
+    } else if (
+      lowerCategory.includes("transport") ||
+      lowerCategory.includes("car") ||
+      lowerCategory.includes("bus") ||
+      lowerCategory.includes("taxi") ||
+      lowerCategory.includes("drive") ||
+      lowerCategory.includes("train") ||
+      lowerCategory.includes("flight") ||
+      lowerCategory.includes("transit")
+    ) {
+      return "transport";
+    } else if (
+      lowerCategory.includes("attraction") ||
+      lowerCategory.includes("tour") ||
+      lowerCategory.includes("visit") ||
+      lowerCategory.includes("sightseeing") ||
+      lowerCategory.includes("explore") ||
+      lowerCategory.includes("hiking") ||
+      lowerCategory.includes("museum")
+    ) {
+      return "attraction";
+    } else {
+      return "general";
+    }
+  };
+
+  // Initialize expanded days based on tripPlan data
+  useEffect(() => {
+    if (tripPlan?.days) {
+      const expanded: Record<number, boolean> = {};
+      tripPlan.days.forEach((_, index) => {
+        expanded[index + 1] = index < 2; // Expand first two days by default
+      });
+      setExpandedDays(expanded);
+    }
+  }, [tripPlan]);
 
   // Notify parent to collapse sidebar when drawer opens
   useEffect(() => {
@@ -113,13 +199,17 @@ const ItineraryDrawer: React.FC<ItineraryDrawerProps> = ({
         return <DirectionsWalkIcon fontSize="small" />;
       case "accommodation":
         return <HotelIcon fontSize="small" />;
+      case "transport":
+        return <DirectionsCarIcon fontSize="small" />;
+      case "general":
+        return <ExploreIcon fontSize="small" />;
       default:
-        return null;
+        return <ExploreIcon fontSize="small" />;
     }
   };
 
   // Enhanced mock itinerary data with categories and locations
-  const itineraryDays: ItineraryDay[] = [
+  const mockItineraryDays: ItineraryDay[] = [
     {
       day: 1,
       date: "Monday, June 12, 2023",
@@ -214,6 +304,28 @@ const ItineraryDrawer: React.FC<ItineraryDrawerProps> = ({
       weatherForecast: "Partly Cloudy, 72°F",
     },
   ];
+
+  // Convert tripPlan to itineraryDays format
+  const itineraryDays =
+    tripPlan?.days?.map((day, index) => {
+      // Extract location from first activity, or use destination
+      const location = day.activities[0]?.location || tripPlan.destination;
+
+      return {
+        day: index + 1,
+        date: day.date,
+        location: location,
+        activities: day.activities.map((activity, actIndex) => ({
+          time: "--:--", // TODO: Add time
+          activity: activity.name,
+          category: mapCategoryToIcon(activity.category),
+          description: activity.description,
+          cost: activity.price ? `${"$".repeat(activity.price)}` : "Varies",
+        })),
+        accommodationDetails: "Hotel accommodation",
+        weatherForecast: "Weather information not available",
+      };
+    }) || mockItineraryDays;
 
   return (
     <Drawer
@@ -316,7 +428,9 @@ const ItineraryDrawer: React.FC<ItineraryDrawerProps> = ({
               Your Itinerary
             </Typography>
             <Typography variant="subtitle1">
-              {tripParameters.location || "Destination"}
+              {tripPlan?.destination ||
+                tripParameters.location ||
+                "Destination"}
             </Typography>
           </Box>
           <Box>
@@ -342,14 +456,20 @@ const ItineraryDrawer: React.FC<ItineraryDrawerProps> = ({
           <Chip
             icon={<CalendarTodayIcon />}
             label={`${
-              tripParameters.startDate?.toLocaleDateString() || "Start date"
-            } - ${tripParameters.endDate?.toLocaleDateString() || "End date"}`}
+              tripPlan?.startDate ||
+              tripParameters.startDate?.toLocaleDateString() ||
+              "Start date"
+            } - ${
+              tripPlan?.endDate ||
+              tripParameters.endDate?.toLocaleDateString() ||
+              "End date"
+            }`}
             size="small"
             sx={{ bgcolor: "rgba(255,255,255,0.2)", color: "inherit" }}
           />
           <Chip
             icon={<LocalOfferIcon />}
-            label={`Budget: ${tripParameters.budget}`}
+            label={`Budget: ${tripPlan?.budget || tripParameters.budget}`}
             size="small"
             sx={{ bgcolor: "rgba(255,255,255,0.2)", color: "inherit" }}
           />
@@ -432,8 +552,13 @@ const ItineraryDrawer: React.FC<ItineraryDrawerProps> = ({
             }}
           >
             We've crafted an amazing {itineraryDays.length}-day experience in{" "}
-            {tripParameters.location || "your destination"}. This itinerary has
-            been personalized based on your preferences and travel style.
+            {tripPlan?.destination ||
+              tripParameters.location ||
+              "your destination"}
+            .
+            {tripPlan?.summary
+              ? ` ${tripPlan.summary}`
+              : " This itinerary has been personalized based on your preferences and travel style."}
           </Typography>
         </Paper>
 
@@ -617,8 +742,8 @@ const ItineraryDrawer: React.FC<ItineraryDrawerProps> = ({
                 }}
               >
                 <Typography variant="body2" fontStyle="italic">
-                  Enjoy your day in {day.location}! All activities have been
-                  arranged with your preferences in mind.
+                  {tripPlan?.days?.[day.day - 1]?.notes ||
+                    `Enjoy your day in ${day.location}! All activities have been arranged with your preferences in mind.`}
                 </Typography>
               </Box>
             </Collapse>
