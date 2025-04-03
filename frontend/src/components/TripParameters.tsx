@@ -25,7 +25,8 @@ import PeopleIcon from "@mui/icons-material/People";
 
 // Define the parameters interface
 export interface TripParameters {
-  location: string;
+  location?: string;
+  tripType?: string;
   startDate: Date | null;
   endDate: Date | null;
   budget: string;

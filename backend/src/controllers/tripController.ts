@@ -14,34 +14,58 @@ export const chatWithTripPlanner = async (req: Request, res: Response): Promise<
     const { message, tripParameters, chatHistory } = req.body;
     
     if (!message) {
+      console.log('No message provided in request');
       res.status(400).json({ error: 'Message is required' });
       return;
     }
     
-    // Use provided parameters or initialize empty ones
+    // Check if user provided at least a location or tripType
     const parameters: TripParameters = tripParameters || {
       location: '',
+      tripType: '',
       startDate: null,
       endDate: null,
       budget: 'medium',
       travelers: 1
     };
     
+    console.log('Calling OpenAI service with parameters:', {
+      message,
+      parameters,
+      chatHistoryLength: chatHistory?.length || 0
+    });
+    
     // Process chat with OpenAI service
-    const { reply, isReadyForPlanning } = await conversationalPlanningChat(
+    const { reply, commandDetected } = await conversationalPlanningChat(
       message,
       parameters,
       chatHistory
     );
     
-    // Return response with planning readiness flag
+    console.log('Received response from OpenAI:', {
+      replyLength: reply?.length || 0,
+      commandDetected
+    });
+    
+    // Return response with planning readiness flag and command detection
     res.json({
       reply,
-      isReadyForPlanning
+      commandDetected
     });
   } catch (error: any) {
-    console.error('Error in chat with trip planner:', error);
-    res.status(500).json({ error: 'Failed to process chat message' });
+    console.error('Error in chat with trip planner:', {
+      message: error.message,
+      stack: error.stack,
+      response: error.response?.data,
+      status: error.response?.status,
+      headers: error.response?.headers
+    });
+    
+    res.status(500).json({ 
+      error: error.message || 'Failed to process chat message',
+      details: error.response?.data || null,
+      type: error.name || 'UnknownError'
+    });
   }
 };
 

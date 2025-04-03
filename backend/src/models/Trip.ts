@@ -50,7 +50,8 @@ const TripSchema: Schema<ITrip> = new Schema(
 
 // Trip parameters (for request/response) TBD:  need to to update this
 export interface TripParameters {
-  location: string;
+  location?: string;
+  tripType?: string;
   startDate: Date | null;
   endDate: Date | null;
   budget: string;

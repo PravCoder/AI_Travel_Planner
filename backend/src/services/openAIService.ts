@@ -23,80 +23,97 @@ export async function conversationalPlanningChat(
   chatHistory: ChatMessage[] = []
 ): Promise<{
   reply: string;
-  isReadyForPlanning: boolean;
+  commandDetected: boolean;
 }> {
-  // Build the system message
-  const systemMessage: ChatMessage = {
-    role: 'system',
+  try {
+    // Build the system message
+    const systemMessage: ChatMessage = {
+      role: 'system',
     content: `You are a conversational AI assistant helping someone plan a trip.
 
-Your job is to gather trip preferences in a natural, friendly conversation. Keep replies brief (2-3 sentences max), and focus on asking thoughtful questions that help clarify what the traveler wants.
+Your job is to gather basic trip information and make reasonable assumptions for missing details. Keep replies brief (2-3 sentences max) and warm. If you need more information, focus on asking thoughtful questions that help clarify what the traveler wants.
 
 You already know:
 - Destination: ${parameters.location || 'Not specified'}
+- Trip Type: ${parameters.tripType || 'Not specified'}
 - Dates: ${
-      parameters.startDate
-        ? new Date(parameters.startDate).toLocaleDateString()
-        : 'Not specified'
-    } ${
-      parameters.endDate
-        ? 'to ' + new Date(parameters.endDate).toLocaleDateString()
-        : ''
-    }
+        parameters.startDate
+          ? new Date(parameters.startDate).toLocaleDateString()
+          : 'Not specified'
+      } ${
+        parameters.endDate
+          ? 'to ' + new Date(parameters.endDate).toLocaleDateString()
+          : ''
+      }
 - Budget Level: ${
-      parameters.budget
-        ? parameters.budget.charAt(0).toUpperCase() + parameters.budget.slice(1)
-        : 'Not specified'
-    } (1=budget, 2=economy, 3=medium, 4=premium, 5=luxury)
-- Travelers: ${parameters.travelers || 'Not specified'}
+        parameters.budget
+          ? parameters.budget.charAt(0).toUpperCase() + parameters.budget.slice(1)
+        : 'Medium (assumed)'
+    }
+- Travelers: ${parameters.travelers || '1 (assumed)'}
 
-Your goals:
-- Fill in any missing details (dates, budget, preferences, group size)
-- Help the user reflect on what kind of trip they want (pace, interests, vibe)
-- Ask open-ended or multiple-choice questions to inspire the user
+If the user doesn't specify some details, make reasonable assumptions based on their destination or trip type.
 
-Don't give a full itinerary. When you feel ready to create a full trip plan, use exactly one of these phrases:
-- "I think I have enough information to create your trip plan now. Would you like me to generate it?"
-- "Based on what you've shared, I can create your trip plan. Should I go ahead?"
-- "I have all the details I need for your trip plan. Ready to see it?"
+Ask questions to learn about their interests, preferences, and travel style, but don't be repetitive.
 
-Keep your tone warm, concise, and curious—like a smart friend helping plan an awesome trip.`,
-  };
+DO NOT use phrases like "I need more information" or "I need to know X before creating your plan."
 
-  // Build the complete messages array
-  const messages: ChatMessage[] = [systemMessage];
+If the user asks for a trip plan or itinerary, respond with: "I'll create your trip plan now."`,
+    };
 
-  // Add chat history if available
-  if (chatHistory.length > 0) {
-    messages.push(...chatHistory);
+    // Build the complete messages array
+    const messages: ChatMessage[] = [systemMessage];
+
+    // Add chat history if available
+    if (chatHistory.length > 0) {
+      messages.push(...chatHistory);
+    }
+
+    // Add the current user message
+    messages.push({ role: 'user', content: message });
+
+    // Call OpenAI with the specified model
+    const response = await openai.chat.completions.create({
+      model: "gpt-4o-mini",
+      messages,
+      response_format: { type: "text" },
+      temperature: 0.7,
+      max_tokens: 500
+    });
+
+    const replyContent = response.choices[0]?.message?.content;
+    if (!replyContent) {
+      throw new Error('No response content received from OpenAI');
+    }
+
+    // Check for trip plan generation commands
+    const planCommandRegex = /(create|generate|make|show|give me).*(plan|itinerary|trip|schedule)/i;
+    const aiPlanIndicator = /I'll create your trip plan now/i;
+    
+    const commandDetected = planCommandRegex.test(message) || aiPlanIndicator.test(replyContent);
+
+    return {
+      reply: replyContent,
+      commandDetected
+    };
+  } catch (error: any) {
+    console.error('OpenAI API Error:', {
+      message: error.message,
+      status: error.response?.status,
+      data: error.response?.data,
+      stack: error.stack,
+      type: error.name,
+      code: error.code
+    });
+    
+    if (error.response?.status === 401) {
+      throw new Error('Invalid OpenAI API key. Please check your API key configuration.');
+    } else if (error.response?.status === 429) {
+      throw new Error('Rate limit exceeded. Please try again later.');
+    } else {
+      throw new Error(`OpenAI API error: ${error.message || 'Unknown error occurred'}`);
+    }
   }
-
-  // Add the current user message
-  messages.push({ role: 'user', content: message });
-
-  // Call OpenAI with the specified model
-  const response = await openai.chat.completions.create({
-    model: 'gpt-4o-mini',
-    messages,
-  });
-
-  const replyContent = response.choices[0].message.content || 'No response';
-
-  // Check if the AI is indicating readiness to generate a trip plan
-  const readinessIndicators = [
-    /I think I have enough information to create your trip plan now/i,
-    /Based on what you've shared, I can create your trip plan/i,
-    /I have all the details I need for your trip plan/i,
-  ];
-
-  const isReadyForPlanning = readinessIndicators.some((indicator) =>
-    indicator.test(replyContent)
-  );
-
-  return {
-    reply: replyContent,
-    isReadyForPlanning,
-  };
 }
 
 /**
@@ -107,104 +124,192 @@ export async function generateStructuredTripPlan(
   parameters: TripParameters,
   conversationContext: string[] = []
 ): Promise<any> {
-  // Build system message with JSON structure instructions
-  const systemMessage: ChatMessage = {
-    role: 'system',
-    content: `Generate a detailed trip plan for ${
-      parameters.location
-    } as a valid JSON object with this structure:
-    {
-      "destination": "${parameters.location}",
-      "startDate": ${
-        parameters.startDate
-          ? `"${new Date(parameters.startDate).toISOString().split('T')[0]}"`
-          : 'null'
-      },
-      "endDate": ${
-        parameters.endDate
-          ? `"${new Date(parameters.endDate).toISOString().split('T')[0]}"`
-          : 'null'
-      },
-      "days": [
-        {
-          "date": "YYYY-MM-DD or Day X",
-          "activities": [
-            {
-              "name": "Activity name",
-              "description": "Brief description",
-              "location": "Specific location",
-              "category": "Category (Food, Outdoor, Cultural, Entertainment, etc.)",
-              "price": 1-5 (1=budget, 5=luxury),
-              "tags": ["tag1", "tag2"]
-            }
-          ],
-          "notes": "Optional day notes"
-        }
-      ],
-      "budget": "${parameters.budget || 'medium'}",
-      "travelers": ${parameters.travelers || 1},
-      "summary": "Brief trip summary",
-      "tags": ["tag1", "tag2"]
+  try {
+    // Ensure we have either a location or trip type
+    if (!parameters.location && !parameters.tripType) {
+      throw new Error('Either location or trip type must be specified');
     }
     
-    Create activities that are appropriate for the destination, budget level, and number of travelers.
-    If dates are provided, create a day-by-day itinerary; otherwise, create a sample itinerary.
-    Return ONLY valid JSON with no additional text before or after the JSON object.`,
-  };
+    // Build system message with instructions
+    const systemMessage: ChatMessage = {
+      role: 'system',
+      content: `Generate a detailed trip plan ${parameters.location ? `for ${parameters.location}` : `for a ${parameters.tripType} trip`}.
 
-  // Add conversation context if available
-  const contextMessage =
-    conversationContext.length > 0
-      ? {
-          role: 'system' as const,
-          content: `Relevant user preferences from conversation: ${conversationContext.join(
-            ' '
-          )}`,
+For this trip, make reasonable assumptions about any missing information:
+- Location: ${parameters.location || '(Please select an appropriate destination based on the trip type)'}
+- Trip Type: ${parameters.tripType || '(Determine based on the location)'}
+- Dates: ${parameters.startDate ? `${new Date(parameters.startDate).toLocaleDateString()}` : 'Assume a 5-day trip starting next month'} 
+  ${parameters.endDate ? `to ${new Date(parameters.endDate).toLocaleDateString()}` : ''}
+- Budget: ${parameters.budget || 'medium (default)'} 
+- Travelers: ${parameters.travelers || '1 (default)'}
+
+Return ONLY the JSON with no additional text before or after it.`
+    };
+
+    // Add conversation context if available
+    const contextMessage =
+      conversationContext.length > 0
+        ? {
+            role: 'system' as const,
+            content: `Relevant user preferences from conversation: ${conversationContext.join(' ')}`,
+          }
+        : null;
+
+    // Build messages array
+    const messages: ChatMessage[] = [systemMessage];
+    if (contextMessage) messages.push(contextMessage);
+
+    // Add user request message
+    messages.push({
+      role: 'user',
+      content: `Generate a detailed trip plan ${parameters.location ? `for ${parameters.location}` : `for a ${parameters.tripType} trip`}. Make reasonable assumptions for any missing details and create an exciting itinerary.`
+    });
+
+    // Call OpenAI with the specified model and structured output format
+    const response = await openai.chat.completions.create({
+      model: "gpt-4o-mini",
+      messages,
+      temperature: 0.7,
+      response_format: {
+        type: "json_schema",
+        json_schema: {
+          name: "TripPlan",
+          schema: {
+            type: "object",
+            properties: {
+              destination: {
+              type: "string",
+              description: "The destination for the trip"
+            },
+            tripType: {
+              type: "string",
+              description: "The type of trip (beach, mountain, city, etc.)"
+            },
+            startDate: {
+              type: ["string", "null"],
+              description: "The start date of the trip in YYYY-MM-DD format, or null if not specified"
+            },
+            endDate: {
+              type: ["string", "null"],
+              description: "The end date of the trip in YYYY-MM-DD format, or null if not specified"
+            },
+            days: {
+              type: "array",
+              description: "Array of day objects containing activities",
+              items: {
+                type: "object",
+                properties: {
+                  date: {
+                    type: "string",
+                    description: "Date of this day in YYYY-MM-DD format or 'Day X' format"
+                  },
+                  activities: {
+                    type: "array",
+                    description: "List of activities for this day",
+                    items: {
+                      type: "object",
+                      properties: {
+                        name: {
+                          type: "string",
+                          description: "Name of the activity"
+                        },
+                        description: {
+                          type: "string",
+                          description: "Brief description of the activity"
+                        },
+                        location: {
+                          type: "string",
+                          description: "Specific location for the activity"
+                        },
+                        category: {
+                          type: "string",
+                          description: "Category of the activity (Food, Outdoor, Cultural, etc.)"
+                        },
+                        price: {
+                          type: "integer",
+                          description: "Price level from 1-5 (1=budget, 5=luxury)",
+                          minimum: 1,
+                          maximum: 5
+                        },
+                        tags: {
+                          type: "array",
+                          description: "Tags relevant to this activity",
+                          items: {
+                            type: "string"
+                          }
+                        }
+                      },
+                      required: ["name", "description", "location", "category", "price"]
+                    }
+                  },
+                  notes: {
+                    type: "string",
+                    description: "Optional notes for this day"
+                  }
+                },
+                required: ["date", "activities"]
+              }
+            },
+            budget: {
+              type: "string",
+              description: "Budget level (budget, economy, medium, premium, luxury)"
+            },
+            travelers: {
+              type: "integer",
+              description: "Number of travelers"
+            },
+            summary: {
+              type: "string",
+              description: "Brief summary of the trip plan"
+            },
+            tags: {
+              type: "array",
+              description: "Tags relevant to this trip",
+              items: {
+                type: "string"
+              }
+            }
+          },
+          required: ["destination", "days", "budget", "travelers", "summary", "tags"]
         }
-      : null;
+      }
+    },
+    });
 
-  // Build messages array
-  const messages: ChatMessage[] = [systemMessage];
-  if (contextMessage) messages.push(contextMessage);
+    const content = response.choices[0]?.message?.content;
 
-  // Add user request message
-  messages.push({
-    role: 'user',
-    content: `Please generate a complete trip plan for ${
-      parameters.location
-    } with the following parameters:
-    - Budget: ${parameters.budget || 'medium'}
-    - Number of travelers: ${parameters.travelers || 1}
-    - Start date: ${
-      parameters.startDate
-        ? new Date(parameters.startDate).toLocaleDateString()
-        : 'flexible'
+    if (!content) {
+      throw new Error('No response content received from OpenAI');
     }
-    - End date: ${
-      parameters.endDate
-        ? new Date(parameters.endDate).toLocaleDateString()
-        : 'flexible'
-    }`,
-  });
 
-  // Call OpenAI with the specified model and JSON response format
-  const response = await openai.chat.completions.create({
-    model: 'gpt-4o-mini',
-    messages,
-    response_format: { type: 'json_object' },
-  });
-
-  const content = response.choices[0].message.content;
-
-  if (!content) {
-    throw new Error('No response content received from OpenAI');
-  }
-
-  // Parse the JSON response
-  try {
-    return JSON.parse(content);
-  } catch (error) {
-    console.error('Error parsing trip plan JSON:', error);
-    throw new Error('Generated trip plan is not valid JSON');
+    // Parse the JSON response
+    try {
+      const parsedResponse = JSON.parse(content);
+      
+      // Validate the structure meets our requirements
+      if (!parsedResponse.destination || !Array.isArray(parsedResponse.days)) {
+        throw new Error('Invalid trip plan format: missing required fields');
+      }
+      
+      return parsedResponse;
+    } catch (error) {
+      console.error('Error parsing trip plan JSON:', error);
+      throw new Error('Generated trip plan is not valid JSON');
+    }
+  } catch (error: any) {
+    console.error('OpenAI API Error:', {
+      message: error.message,
+      status: error.response?.status,
+      data: error.response?.data,
+      stack: error.stack
+    });
+    
+    if (error.response?.status === 401) {
+      throw new Error('Invalid OpenAI API key. Please check your API key configuration.');
+    } else if (error.response?.status === 429) {
+      throw new Error('Rate limit exceeded. Please try again later.');
+    } else {
+      throw new Error(`OpenAI API error: ${error.message || 'Unknown error occurred'}`);
+    }
   }
 }

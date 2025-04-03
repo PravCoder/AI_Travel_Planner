@@ -30,16 +30,16 @@ const CreateTripPage: React.FC = () => {
   // Trip parameters state - initialize with URL param if available
   const [tripParameters, setTripParameters] = useState<TripParametersType>({
     location: searchParams.get("destination") || "",
+    tripType: "",
     startDate: null,
     endDate: null,
-    budget: "budget",
+    budget: "medium",
     travelers: 1,
   });
 
   // Chat messages state
   const [messages, setMessages] = useState<ChatMessageType[]>([]);
   const [isLoading, setIsLoading] = useState(false);
-  const [isReadyForPlanning, setIsReadyForPlanning] = useState(false);
 
   // TODO: might want to allow the chatbot to modify trip parameters if it gains new info through the chat
   // (e.g., if the user mentions a specific date or budget preference that differs from the initial input)
@@ -241,7 +241,24 @@ const CreateTripPage: React.FC = () => {
     chatHistoryRef.current.push({ role: "user", content: messageText });
 
     try {
-      // Call the OpenAI API via our backend
+      // Check if we should directly generate a plan (trigger words in user message)
+      const planCommandRegex =
+        /(create|generate|make|show|give me).*(plan|itinerary|trip|schedule)/i;
+      const directPlanRequest = planCommandRegex.test(messageText);
+
+      // Only proceed with trip generation if we have at least a location or trip type
+      const canGeneratePlan =
+        directPlanRequest &&
+        (tripParameters.location || tripParameters.tripType);
+
+      if (canGeneratePlan) {
+        // Skip AI response and directly generate the plan
+        await generateTripPlan();
+        setIsLoading(true);
+        return;
+      }
+
+      // Regular chat flow
       const response = await axios.post(`${API_BASE_URL}/trip/chat`, {
         message: messageText,
         tripParameters,
@@ -250,35 +267,41 @@ const CreateTripPage: React.FC = () => {
 
       // Extract AI response
       const aiResponseText = response.data.reply;
-      const isReady = response.data.isReadyForPlanning;
+      const commandDetected = response.data.commandDetected;
 
-      // Update planning readiness if needed
-      if (isReady) {
-        setIsReadyForPlanning(true);
+      // Check if the AI detected a command to generate a plan
+      if (
+        commandDetected &&
+        (tripParameters.location || tripParameters.tripType)
+      ) {
+        // AI detected a plan generation command and we have minimum requirements
+        await generateTripPlan();
+      } else {
+        // Add AI response message
+        const aiMessage: ChatMessageType = {
+          id: uuidv4(),
+          text: aiResponseText,
+          sender: "ai",
+          timestamp: new Date(),
+        };
+
+        setMessages((prev) => [...prev, aiMessage]);
+
+        // Update chat history with AI response
+        chatHistoryRef.current.push({
+          role: "assistant",
+          content: aiResponseText,
+        });
       }
-
-      // Create and add AI message
-      const aiMessage: ChatMessageType = {
-        id: uuidv4(),
-        text: aiResponseText,
-        sender: "ai",
-        timestamp: new Date(),
-      };
-
-      setMessages((prev) => [...prev, aiMessage]);
-
-      // Update chat history with AI response
-      chatHistoryRef.current.push({
-        role: "assistant",
-        content: aiResponseText,
-      });
-    } catch (error) {
+    } catch (error: any) {
       console.error("Error getting AI response:", error);
 
-      // Add error message
+      // Add error message with specific error details if available
       const errorMessage: ChatMessageType = {
         id: uuidv4(),
-        text: "Sorry, I encountered an error. Please try again.",
+        text:
+          error.response?.data?.error ||
+          "Sorry, I encountered an error. Please try again.",
         sender: "ai",
         timestamp: new Date(),
       };
@@ -323,38 +346,6 @@ const CreateTripPage: React.FC = () => {
   const handleDrawerSideChange = (side: "left" | "right") => {
     setDrawerSide(side);
   };
-
-  // Listen for when user is ready to generate trip plan
-  useEffect(() => {
-    if (isReadyForPlanning) {
-      // Add a button or message prompting user to generate plan
-      const promptMessage: ChatMessageType = {
-        id: uuidv4(),
-        text: "I have enough information to create your trip plan. Would you like me to generate it now? Type 'yes' to proceed.",
-        sender: "ai",
-        timestamp: new Date(),
-      };
-
-      setMessages((prev) => [...prev, promptMessage]);
-      chatHistoryRef.current.push({
-        role: "assistant",
-        content: promptMessage.text,
-      });
-    }
-  }, [isReadyForPlanning]);
-
-  // Check for "yes" responses when ready for planning
-  useEffect(() => {
-    const lastMessage = messages[messages.length - 1];
-
-    if (
-      isReadyForPlanning &&
-      lastMessage?.sender === "user" &&
-      /^(yes|yeah|sure|ok|okay|generate|create|please)/i.test(lastMessage.text)
-    ) {
-      generateTripPlan();
-    }
-  }, [messages, isReadyForPlanning, generateTripPlan]);
 
   return (
     <Box
