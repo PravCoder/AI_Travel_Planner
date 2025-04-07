@@ -22,7 +22,7 @@ router.post('/update-trip', updateTrip);
 
 
 
-// TESTING ROUTES BELOW:
+// TESTING ROUTES BELOW::
 router.post('/test-create-complete-trip', testCreateCompleteTrip);
 router.post('/test-get-days-from-trip', testGetDaysFromTrip);
 
