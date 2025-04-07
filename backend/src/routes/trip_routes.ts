@@ -13,7 +13,7 @@ const router = express.Router();
 // Chat route
 router.post('/chat', chatWithTripPlanner);
 
-// Trip generation route
+// Trip generation routes
 router.post('/generate', generateTripPlan);
 
 router.post('/create-trip', createEmptyTrip);
