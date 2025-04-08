@@ -16,6 +16,8 @@ import TripCard from "../components/TripCard";
 import { Trip } from "../types/trip";
 import { useNavigate } from "react-router-dom";
 import Chat from "../components/Chat";
+import axios from "axios";
+import getCurrentUser from "../hooks/getCurrentUser";
 
 const DashboardHeader = styled(Box)(({ theme }) => ({
   display: "flex",
@@ -29,6 +31,27 @@ export default function Dashboard() {
   const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
+
+
+  // this function is called when new trip button is clicked
+  const handleNewTrip = async () => {
+    // Replace with dynamic user ID 
+    const userId = getCurrentUser(); 
+  
+    // send request to trip-route /create-trip to create emptry tip object saved to user.trips.
+    try {
+      const response = await axios.post("http://localhost:3001/trip/create-trip", {
+        userId,
+      });
+  
+      console.log("Trip created:", response.data);
+  
+      // Navigate to trip details or creation flow (optional)
+      navigate("/create-trip");
+    } catch (error) {
+      console.error("Error creating trip:", error);
+    }
+  };
 
   useEffect(() => {
     const fetchTrips = async () => {
@@ -76,9 +99,9 @@ export default function Dashboard() {
     fetchTrips();
   }, []);
 
-  const handleAddTrip = () => {
-    navigate("/create-trip");
-  };
+  // const handleAddTrip = () => {
+  //   navigate("/create-trip");
+  // };
 
   const handleToggleFavorite = (tripId: string) => {
     setTrips(
@@ -121,14 +144,8 @@ export default function Dashboard() {
               <ViewListIcon />
             </Button>
           </ButtonGroup>
-          <Button
-            variant="contained"
-            color="primary"
-            startIcon={<AddIcon />}
-            onClick={handleAddTrip}
-          >
-            New Trip
-          </Button>
+          
+          <Button variant="contained" color="primary" startIcon={<AddIcon />}  onClick={handleNewTrip}>New Trip</Button>
         </Box>
       </DashboardHeader>
 

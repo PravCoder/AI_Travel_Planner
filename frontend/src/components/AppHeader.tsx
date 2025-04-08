@@ -8,6 +8,7 @@ import MenuIcon from "@mui/icons-material/Menu";
 import Brightness4Icon from "@mui/icons-material/Brightness4";
 import Brightness7Icon from "@mui/icons-material/Brightness7";
 import { useThemeContext } from "../context/ThemeContext";
+import getCurrentUser from "../hooks/getCurrentUser";
 
 // Define the drawer width (should match the one in SideNav)
 const drawerWidth = 240;
@@ -67,7 +68,7 @@ const AppHeader: React.FC<AppHeaderProps> = ({ open, handleDrawerOpen }) => {
           <MenuIcon />
         </IconButton>
         <Typography variant="h6" noWrap component="div" sx={{ flexGrow: 1 }}>
-          AI Travel Planner
+          AI Travel Planner - Current User: {getCurrentUser()}
         </Typography>
         <IconButton sx={{ ml: 1 }} onClick={toggleColorMode} color="inherit">
           {mode === "dark" ? <Brightness7Icon /> : <Brightness4Icon />}

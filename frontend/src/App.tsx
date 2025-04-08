@@ -9,6 +9,10 @@ import CreateTripPage from "./pages/CreateTripPage";
 import PopularDestinationsPage from "./pages/PopularDestinationsPage";
 import ChatPage from "./pages/ChatPage";
 
+import RegisterPage from "./pages/RegisterPage"; 
+import LoginPage from "./pages/LoginPage"; 
+
+
 
 function App() {
   return (
@@ -22,6 +26,10 @@ function App() {
             <Route path="create-trip" element={<CreateTripPage />} />
             <Route path="chat" element={<ChatPage />} />
             <Route path="about" element={<AboutPage />} />
+
+            <Route path="/login" element={<LoginPage />} />
+            <Route path="/register" element={<RegisterPage />} />
+
             <Route
               path="popular-destinations"
               element={<PopularDestinationsPage />}

@@ -124,11 +124,11 @@ Postman data:
 */
 export const createEmptyTrip = async (req: Request, res: Response): Promise<void> => {
   try {
-      const { userId } = req.body; // when this request is sent make sure to send user-id with it
+      const { userID } = req.body; // when this request is sent make sure to send user-id with it
       const new_trip = new TripModel({title:"Untitled Trip", startDate:null, endDate:null, numTravelers:null, budget:null, currentCost:null,country:null, city:null,destinations:null,address:null, location: { type: "Point", coordinates: [0, 0]} }); // 0,0 coordinates for now
       const saved_new_trip = await new_trip.save();
 
-      const user = await UserModel.findById(userId); // get the current logged in user (via cookies)
+      const user = await UserModel.findById(userID); // get the current logged in user (via cookies)
       if (user != null) {
         console.log("creating empty trip for " + user.username)
         user.trips.push(saved_new_trip._id as any); // add the newly intialized trip-obj to the users trips
