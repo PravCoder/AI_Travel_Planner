@@ -37,17 +37,20 @@ interface TripPlanActivity {
   location: string;
   category: string;
   price: number;
+  time: string;
   tags: string[];
 }
 
 interface TripPlanDay {
   date: string;
+  hotel: string;
   activities: TripPlanActivity[];
   notes?: string;
 }
 
 interface TripPlan {
   destination: string;
+  title: string;
   startDate: string | null;
   endDate: string | null;
   days: TripPlanDay[];
@@ -73,24 +76,6 @@ type ActivityCategory =
   | "transport"
   | "accommodation"
   | "general";
-
-interface Activity {
-  time: string;
-  activity: string;
-  category: ActivityCategory;
-  description?: string;
-  cost?: string;
-}
-
-// Day interface to ensure type safety
-interface ItineraryDay {
-  day: number;
-  date: string;
-  location: string;
-  activities: Activity[];
-  accommodationDetails: string;
-  weatherForecast: string;
-}
 
 // Add a constant for the sidebar widths
 const SIDEBAR_COLLAPSED_WIDTH = 65; // Width in pixels when collapsed
@@ -208,6 +193,7 @@ const ItineraryDrawer: React.FC<ItineraryDrawerProps> = ({
     }
   };
 
+  /*
   // Enhanced mock itinerary data with categories and locations
   const mockItineraryDays: ItineraryDay[] = [
     {
@@ -304,28 +290,30 @@ const ItineraryDrawer: React.FC<ItineraryDrawerProps> = ({
       weatherForecast: "Partly Cloudy, 72°F",
     },
   ];
+  */
 
   // Convert tripPlan to itineraryDays format
-  const itineraryDays =
-    tripPlan?.days?.map((day, index) => {
-      // Extract location from first activity, or use destination
-      const location = day.activities[0]?.location || tripPlan.destination;
+  const itineraryDays = tripPlan?.days?.map((day, index) => {
+    // Extract location from first activity, or use destination
+    const location = day.activities[0]?.location || tripPlan.destination;
 
-      return {
-        day: index + 1,
-        date: day.date,
-        location: location,
-        activities: day.activities.map((activity, actIndex) => ({
-          time: "--:--", // TODO: Add time
-          activity: activity.name,
-          category: mapCategoryToIcon(activity.category),
-          description: activity.description,
-          cost: activity.price ? `${"$".repeat(activity.price)}` : "Varies",
-        })),
-        accommodationDetails: "Hotel accommodation",
-        weatherForecast: "Weather information not available",
-      };
-    }) || mockItineraryDays;
+    return {
+      day: index + 1,
+      date: day.date,
+      location: location,
+      activities: day.activities.map((activity) => ({
+        activity: activity.name,
+        description: activity.description,
+        location: activity.location,
+        category: mapCategoryToIcon(activity.category),
+        price: `${activity.price}`,
+        time: activity.time,
+        tags: activity.tags,
+      })),
+      hotel: day.hotel,
+      weatherForecast: "Weather information currently not available",
+    };
+  });
 
   return (
     <Drawer
@@ -425,7 +413,7 @@ const ItineraryDrawer: React.FC<ItineraryDrawerProps> = ({
         >
           <Box>
             <Typography variant="h5" component="div" fontWeight="bold">
-              Your Itinerary
+              {tripPlan?.title || "Your Itinerary"}
             </Typography>
             <Typography variant="subtitle1">
               {tripPlan?.destination ||
@@ -542,7 +530,9 @@ const ItineraryDrawer: React.FC<ItineraryDrawerProps> = ({
               letterSpacing: "0.5px",
             }}
           >
-            Your Adventure Awaits!
+            {itineraryDays?.length
+              ? "Your Adventure Awaits!"
+              : "Get started planning your trip!"}
           </Typography>
           <Typography
             variant="body1"
@@ -551,19 +541,29 @@ const ItineraryDrawer: React.FC<ItineraryDrawerProps> = ({
               fontWeight: "medium",
             }}
           >
-            We've crafted an amazing {itineraryDays.length}-day experience in{" "}
-            {tripPlan?.destination ||
-              tripParameters.location ||
-              "your destination"}
-            .
-            {tripPlan?.summary
-              ? ` ${tripPlan.summary}`
-              : " This itinerary has been personalized based on your preferences and travel style."}
+            {itineraryDays?.length ? (
+              <>
+                We've crafted an amazing {itineraryDays.length}-day experience
+                in{" "}
+                {tripPlan?.destination ||
+                  tripParameters.location ||
+                  "your destination"}
+                .
+                {tripPlan?.summary
+                  ? ` ${tripPlan.summary}`
+                  : " This itinerary has been personalized based on your preferences and travel style."}
+              </>
+            ) : (
+              <>
+                Once you've provided your travel preferences, your itinerary
+                will be generated and displayed here!
+              </>
+            )}
           </Typography>
         </Paper>
 
         {/* Day-by-day itinerary */}
-        {itineraryDays.map((day) => (
+        {itineraryDays?.map((day) => (
           <Paper
             key={day.day}
             elevation={2}
@@ -653,7 +653,7 @@ const ItineraryDrawer: React.FC<ItineraryDrawerProps> = ({
               <Box sx={{ display: "flex", alignItems: "center" }}>
                 <HotelIcon sx={{ mr: 1, color: "primary.main" }} />
                 <Typography variant="body2" fontWeight="medium">
-                  {day.accommodationDetails}
+                  {day.hotel}
                 </Typography>
               </Box>
             </Box>
@@ -712,9 +712,9 @@ const ItineraryDrawer: React.FC<ItineraryDrawerProps> = ({
                             {item.description}
                           </Typography>
                         )}
-                        {item.cost && (
+                        {item.price && (
                           <Chip
-                            label={item.cost}
+                            label={item.price}
                             size="small"
                             sx={{ mt: 1, fontSize: "0.7rem" }}
                             variant="outlined"
@@ -750,27 +750,30 @@ const ItineraryDrawer: React.FC<ItineraryDrawerProps> = ({
           </Paper>
         ))}
 
-        {/* Final notes */}
-        <Paper
-          elevation={1}
-          sx={{
-            p: 2.5,
-            mb: 3,
-            borderRadius: 2,
-            bgcolor:
-              theme.palette.mode === "dark"
-                ? "rgba(255,255,255,0.03)"
-                : "rgba(0,0,0,0.02)",
-            border: "1px dashed",
-            borderColor: "divider",
-          }}
-        >
-          <Typography variant="body2" color="text.secondary">
-            This itinerary is flexible and can be adjusted as needed. All
-            reservations have been confirmed. Please keep a digital or printed
-            copy of this itinerary during your travels.
-          </Typography>
-        </Paper>
+        {itineraryDays?.length ? (
+          <Paper
+            elevation={1}
+            sx={{
+              p: 2.5,
+              mb: 3,
+              borderRadius: 2,
+              bgcolor:
+                theme.palette.mode === "dark"
+                  ? "rgba(255,255,255,0.03)"
+                  : "rgba(0,0,0,0.02)",
+              border: "1px dashed",
+              borderColor: "divider",
+            }}
+          >
+            <Typography variant="body2" color="text.secondary">
+              This itinerary is flexible and can be adjusted as needed. All
+              reservations have been confirmed. Please keep a digital or printed
+              copy of this itinerary during your travels.
+            </Typography>
+          </Paper>
+        ) : (
+          ""
+        )}
       </Box>
     </Drawer>
   );
