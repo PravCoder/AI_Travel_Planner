@@ -3,6 +3,7 @@ import { Link, useNavigate } from "react-router-dom";
 import axios from "axios";
 import "../styles/LoginPage.css";
 import { TokenHelper } from "../utils/TokenHelper";
+import { GoogleLogin } from "@react-oauth/google";
 
 // Define the shape of the form data
 interface FormData {
@@ -95,6 +96,28 @@ const LoginPage: React.FC = () => {
     }
   };
 
+  const handleGoogleSuccess = async (credentialResponse: any) => {
+    try {
+      const response = await axios.post("http://localhost:3001/user/google-login", {
+        credential: credentialResponse.credential,
+      });
+
+      const token = response.data.token;
+      TokenHelper.setToken(token);
+      navigate("/dashboard");
+    } catch (error) {
+      if (axios.isAxiosError(error) && error.response) {
+        setServerError(error.response.data.message || "Google login failed");
+      } else {
+        setServerError("An unexpected error occurred during Google login");
+      }
+    }
+  };
+
+  const handleGoogleError = () => {
+    setServerError("Google login failed. Please try again.");
+  };
+
   return (
     <div className="login-container">
       <div className="login-form-container">
@@ -137,6 +160,14 @@ const LoginPage: React.FC = () => {
         </form>
 
         <div className="login-options">
+          <div className="google-login-container">
+            <GoogleLogin
+              onSuccess={handleGoogleSuccess}
+              onError={handleGoogleError}
+              useOneTap
+              theme="filled_blue"
+            />
+          </div>
           <p className="register-link">
             Don't have an account? <Link to="/register">Register here</Link>
           </p>

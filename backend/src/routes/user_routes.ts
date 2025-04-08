@@ -8,8 +8,6 @@ const userRouter: Router = express.Router(); // Explicitly defining Router type
 // import controllers
 import * as UserController from "../controllers/user";
 
-
-
 /**
  * Register Route
 */
@@ -21,10 +19,14 @@ userRouter.post("/register", UserController.registerController);
 userRouter.post("/login", UserController.loginController);
 
 /**
+ * Google Login Route
+*/
+userRouter.post("/google-login", UserController.googleLoginController);
+
+/**
  * Refresh Token Route
 */
 userRouter.post("/refresh-token", UserController.refreshTokenController);
-
 
 /*
  * POSTMAN REQUEST URL: http://localhost:3001/user/register
@@ -36,5 +38,4 @@ userRouter.post("/refresh-token", UserController.refreshTokenController);
  * }
  */
 
-
-export default userRouter;
+export { userRouter };

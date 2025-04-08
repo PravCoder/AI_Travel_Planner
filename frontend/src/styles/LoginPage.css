@@ -92,8 +92,14 @@ button:disabled {
 }
 
 .login-options {
-  margin-top: 1.5rem;
+  margin-top: 20px;
   text-align: center;
+}
+
+.google-login-container {
+  margin-bottom: 20px;
+  display: flex;
+  justify-content: center;
 }
 
 .register-link {

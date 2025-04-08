@@ -3,7 +3,7 @@ import express from "express";
 import mongoose from "mongoose";
 
 // Import routers
-import userRouter from "./routes/user_routes"; 
+import { userRouter } from "./routes/user_routes"; 
 
 const app = express(); // Create Express app
 app.use(express.json()); // Ensure JSON parsing
