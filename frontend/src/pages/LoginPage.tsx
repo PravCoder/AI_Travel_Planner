@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import axios from "axios";
 import "../styles/LoginPage.css";
@@ -26,6 +26,14 @@ const LoginPage: React.FC = () => {
   const [errors, setErrors] = useState<FormErrors>({});
   const [isLoading, setIsLoading] = useState(false);
   const [serverError, setServerError] = useState<string>("");
+
+  // Check for existing token on component mount
+  useEffect(() => {
+    const token = TokenHelper.getToken();
+    if (token && !TokenHelper.isTokenExpired(token)) {
+      navigate("/dashboard");
+    }
+  }, [navigate]);
 
   // Form validation
   const validateForm = (): boolean => {

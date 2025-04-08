@@ -1,7 +1,8 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import axios from "axios";
 import "../styles/RegisterPage.css";
+import { TokenHelper } from "../utils/TokenHelper";
 
 interface FormData {
   username: string;
@@ -28,6 +29,14 @@ const RegisterPage: React.FC = () => {
   const [errors, setErrors] = useState<FormErrors>({});
   const [isLoading, setIsLoading] = useState(false);
   const [serverError, setServerError] = useState<string>("");
+
+  // Check for existing token on component mount
+  useEffect(() => {
+    const token = TokenHelper.getToken();
+    if (token && !TokenHelper.isTokenExpired(token)) {
+      navigate("/dashboard");
+    }
+  }, [navigate]);
 
   const validateForm = (): boolean => {
     const newErrors: FormErrors = {};
