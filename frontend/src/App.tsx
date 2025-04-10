@@ -23,7 +23,10 @@ function App() {
           <Route path="/" element={<DashboardLayout />}>
             <Route index element={<DashboardPage />} />
             <Route path="dashboard" element={<DashboardPage />} />
-            <Route path="create-trip" element={<CreateTripPage />} />
+            
+            {/* dynamic url for trip-id */}
+            <Route path="create-trip/:tripID" element={<CreateTripPage />} />
+
             <Route path="chat" element={<ChatPage />} />
             <Route path="about" element={<AboutPage />} />
 

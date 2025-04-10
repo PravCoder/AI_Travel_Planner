@@ -12,6 +12,7 @@ import TripParameters, {
 } from "../components/TripParameters";
 import ItineraryDrawer from "../components/ItineraryDrawer";
 import MapIntegration from "../components/MapIntegration";
+import { useParams } from "react-router-dom";
 
 const API_BASE_URL = "http://localhost:3001"; // Use localhost for development
 
@@ -26,6 +27,9 @@ const CreateTripPage: React.FC = () => {
   const [searchParams] = useSearchParams();
   const hasInitialized = useRef(false);
   const chatHistoryRef = useRef<Array<{ role: string; content: string }>>([]);
+
+  // get the trip-id-url parameter from the url
+  const { tripID } = useParams<{ tripID: string }>();
 
   // Trip parameters state - initialize with URL param if available
   const [tripParameters, setTripParameters] = useState<TripParametersType>({
@@ -377,7 +381,7 @@ const CreateTripPage: React.FC = () => {
         }}
       >
         <Typography variant="h5" component="h1" fontWeight="bold">
-          New Trip
+          New Trip - {tripID}
         </Typography>
 
         {/* Trip parameters in the center */}

@@ -129,12 +129,15 @@ export const createEmptyTrip = async (req: Request, res: Response): Promise<void
       const saved_new_trip = await new_trip.save();
 
       const user = await UserModel.findById(userID); // get the current logged in user (via cookies)
+      console.log("user: " + user);
       if (user != null) {
         console.log("creating empty trip for " + user.username)
         user.trips.push(saved_new_trip._id as any); // add the newly intialized trip-obj to the users trips
         await user.save();
       }
-      res.status(201).json({ message: "trip initialized successfully!", trip: saved_new_trip });
+
+      // return the trip-id to put in the dynaimc url of /create-trip/{tripID}
+      res.status(201).json({ message: "trip initialized successfully!", trip: saved_new_trip, tripID: saved_new_trip._id });
     } catch (error) {
       res.status(500).json({ error: "error intializing trip", message: error });
     }

@@ -36,18 +36,19 @@ export default function Dashboard() {
   // this function is called when new trip button is clicked
   const handleNewTrip = async () => {
     // Replace with dynamic user ID 
-    const userId = getCurrentUser(); 
+    const userID = getCurrentUser(); 
   
     // send request to trip-route /create-trip to create emptry tip object saved to user.trips.
     try {
       const response = await axios.post("http://localhost:3001/trip/create-trip", {
-        userId,
+        userID,
       });
-  
       console.log("Trip created:", response.data);
+
   
-      // Navigate to trip details or creation flow (optional)
-      navigate("/create-trip");
+      // redirect to create-trip of the trip object id with just created which was returned in the response of this request
+      navigate(`/create-trip/${response.data.tripID}`);
+
     } catch (error) {
       console.error("Error creating trip:", error);
     }
