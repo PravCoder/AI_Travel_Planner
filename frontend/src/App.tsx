@@ -7,14 +7,10 @@ import DashboardPage from "./pages/DashboardPage";
 import AboutPage from "./pages/AboutPage";
 import CreateTripPage from "./pages/CreateTripPage";
 import PopularDestinationsPage from "./pages/PopularDestinationsPage";
-import ChatPage from "./pages/ChatPage";
-
 import RegisterPage from "./pages/RegisterPage"; 
 import LoginPage from "./pages/LoginPage"; 
 import { GoogleOAuthProvider } from "@react-oauth/google";
 import ProtectedRoute from "./components/ProtectedRoute";
-
-
 
 function App() {
   return (
@@ -31,8 +27,10 @@ function App() {
           <Route path="/" element={<DashboardLayout />}>
             <Route index element={<DashboardPage />} />
             <Route path="dashboard" element={<DashboardPage />} />
-            <Route path="create-trip" element={<CreateTripPage />} />
-            <Route path="chat" element={<ChatPage />} />
+
+            {/* dynamic url for trip-id */}
+            <Route path="create-trip/:tripID" element={<CreateTripPage />} />
+
             <Route path="about" element={<AboutPage />} />
 
 

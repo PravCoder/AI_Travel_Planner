@@ -7,7 +7,6 @@ import {
   ButtonGroup,
   Grid,
   Container,
-  Paper,
 } from "@mui/material";
 import ViewModuleIcon from "@mui/icons-material/ViewModule";
 import ViewListIcon from "@mui/icons-material/ViewList";
@@ -15,7 +14,6 @@ import AddIcon from "@mui/icons-material/Add";
 import TripCard from "../components/TripCard";
 import { Trip } from "../types/trip";
 import { useNavigate } from "react-router-dom";
-import Chat from "../components/Chat";
 import axios from "axios";
 import getCurrentUser from "../hooks/getCurrentUser";
 
@@ -32,22 +30,23 @@ export default function Dashboard() {
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
 
-
   // this function is called when new trip button is clicked
   const handleNewTrip = async () => {
-    // Replace with dynamic user ID 
-    const userId = getCurrentUser(); 
-  
+    // Replace with dynamic user ID
+    const userID = getCurrentUser();
+
     // send request to trip-route /create-trip to create emptry tip object saved to user.trips.
     try {
-      const response = await axios.post("http://localhost:3001/trip/create-trip", {
-        userId,
-      });
-  
+      const response = await axios.post(
+        "http://localhost:3001/trip/create-trip",
+        {
+          userID,
+        }
+      );
       console.log("Trip created:", response.data);
-  
-      // Navigate to trip details or creation flow (optional)
-      navigate("/create-trip");
+
+      // redirect to create-trip of the trip object id with just created which was returned in the response of this request
+      navigate(`/create-trip/${response.data.tripID}`);
     } catch (error) {
       console.error("Error creating trip:", error);
     }
@@ -144,8 +143,15 @@ export default function Dashboard() {
               <ViewListIcon />
             </Button>
           </ButtonGroup>
-          
-          <Button variant="contained" color="primary" startIcon={<AddIcon />}  onClick={handleNewTrip}>New Trip</Button>
+
+          <Button
+            variant="contained"
+            color="primary"
+            startIcon={<AddIcon />}
+            onClick={handleNewTrip}
+          >
+            New Trip
+          </Button>
         </Box>
       </DashboardHeader>
 
@@ -181,14 +187,6 @@ export default function Dashboard() {
           ))}
         </Grid>
       )}
-
-      {/* 👇 Chat section added below the trips */}
-      <Paper elevation={3} sx={{ mt: 6, p: 3 }}>
-        <Typography variant="h5" gutterBottom>
-          Need help planning your next trip?
-        </Typography>
-        <Chat />
-      </Paper>
     </Container>
   );
 }
