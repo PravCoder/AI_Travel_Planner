@@ -8,7 +8,7 @@ import { useSearchParams } from "react-router-dom";
 import { v4 as uuidv4 } from "uuid";
 import ChatInterface, { ChatMessageType } from "../components/ChatInterface";
 import TripParameters, {
-  TripParameters as TripParametersType,
+  TripParametersData,
 } from "../components/TripParameters";
 import ItineraryDrawer from "../components/ItineraryDrawer";
 import MapIntegration from "../components/MapIntegration";
@@ -32,7 +32,7 @@ const CreateTripPage: React.FC = () => {
   const { tripID } = useParams<{ tripID: string }>();
 
   // Trip parameters state - initialize with URL param if available
-  const [tripParameters, setTripParameters] = useState<TripParametersType>({
+  const [tripParameters, setTripParameters] = useState<TripParametersData>({
     location: searchParams.get("destination") || "",
     tripType: "",
     startDate: null,
@@ -64,7 +64,7 @@ const CreateTripPage: React.FC = () => {
   };
 
   // Handle parameter changes
-  const handleParameterChange = (newParams: Partial<TripParametersType>) => {
+  const handleParameterChange = (newParams: Partial<TripParametersData>) => {
     setTripParameters((prev) => {
       const updated = { ...prev, ...newParams };
 

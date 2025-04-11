@@ -28,7 +28,7 @@ import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import ExpandLessIcon from "@mui/icons-material/ExpandLess";
 import DirectionsCarIcon from "@mui/icons-material/DirectionsCar";
 import ExploreIcon from "@mui/icons-material/Explore";
-import { TripParameters } from "./TripParameters";
+import { TripParametersData } from "./TripParameters";
 
 // Add interface for the trip plan data matching the OpenAI response
 interface TripPlanActivity {
@@ -63,7 +63,7 @@ interface TripPlan {
 interface ItineraryDrawerProps {
   open: boolean;
   onClose: () => void;
-  tripParameters: TripParameters;
+  tripParameters: TripParametersData;
   onSideChange?: (side: "left" | "right") => void;
   onCollapseSidebar?: () => void;
   tripPlan?: TripPlan; // Add tripPlan prop

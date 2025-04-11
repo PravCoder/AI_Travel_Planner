@@ -24,7 +24,7 @@ import AttachMoneyIcon from "@mui/icons-material/AttachMoney";
 import PeopleIcon from "@mui/icons-material/People";
 
 // Define the parameters interface
-export interface TripParameters {
+export interface TripParametersData {
   location?: string;
   tripType?: string;
   startDate: Date | null;
@@ -35,8 +35,8 @@ export interface TripParameters {
 
 // Component props
 export interface TripParametersProps {
-  parameters: TripParameters;
-  onParametersChange: (params: Partial<TripParameters>) => void;
+  parameters: TripParametersData;
+  onParametersChange: (params: Partial<TripParametersData>) => void;
 }
 
 /**
@@ -385,5 +385,4 @@ const TripParameters: React.FC<TripParametersProps> = ({
     </Paper>
   );
 };
-
 export default TripParameters;
