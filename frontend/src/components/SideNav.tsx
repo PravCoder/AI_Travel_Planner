@@ -18,6 +18,7 @@ import TuneIcon from "@mui/icons-material/Tune";
 import ExitToAppIcon from "@mui/icons-material/ExitToApp";
 import { useNavigate } from "react-router-dom";
 import Box from "@mui/material/Box";
+import { TokenHelper } from "../utils/TokenHelper";
 
 // Define the drawer width
 const drawerWidth = 240;
@@ -110,6 +111,10 @@ const SideNav: React.FC<SideNavProps> = ({
 
   const handleProfileMenuClose = () => {
     setProfileMenuAnchorEl(null);
+  };
+
+  const handleLogout = () => {
+    TokenHelper.logout(navigate);
   };
 
   return (
@@ -293,7 +298,7 @@ const SideNav: React.FC<SideNavProps> = ({
           <ListItemText primary="Preferences" />
         </MenuItem>
         <Divider />
-        <MenuItem onClick={handleProfileMenuClose}>
+        <MenuItem onClick={handleLogout}>
           <ListItemIcon>
             <ExitToAppIcon fontSize="small" />
           </ListItemIcon>

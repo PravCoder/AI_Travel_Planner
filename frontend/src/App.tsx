@@ -11,6 +11,8 @@ import ChatPage from "./pages/ChatPage";
 
 import RegisterPage from "./pages/RegisterPage"; 
 import LoginPage from "./pages/LoginPage"; 
+import { GoogleOAuthProvider } from "@react-oauth/google";
+import ProtectedRoute from "./components/ProtectedRoute";
 
 
 
@@ -18,8 +20,14 @@ function App() {
   return (
     <CustomThemeProvider>
       <CssBaseline />
+      <GoogleOAuthProvider clientId="516075917073-kjqp5cjgsn2jl5a3bgijeh8r0bfefvkv.apps.googleusercontent.com">
       <Router>
         <Routes>
+          {/* Public Routes */}
+          <Route path="/login" element={<LoginPage />} />
+          <Route path="/register" element={<RegisterPage />} />
+
+          {/* Protected Routes */}
           <Route path="/" element={<DashboardLayout />}>
             <Route index element={<DashboardPage />} />
             <Route path="dashboard" element={<DashboardPage />} />
@@ -27,8 +35,6 @@ function App() {
             <Route path="chat" element={<ChatPage />} />
             <Route path="about" element={<AboutPage />} />
 
-            <Route path="/login" element={<LoginPage />} />
-            <Route path="/register" element={<RegisterPage />} />
 
             <Route
               path="popular-destinations"
@@ -37,6 +43,7 @@ function App() {
           </Route>
         </Routes>
       </Router>
+      </GoogleOAuthProvider>
     </CustomThemeProvider>
   );
 }

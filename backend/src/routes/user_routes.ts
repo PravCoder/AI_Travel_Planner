@@ -140,4 +140,14 @@ userRouter.post("/register", UserController.registerController);
  * Login Route
 */
 userRouter.post("/login", UserController.loginController);
+
+/*
+Google Login Route
+*/
+userRouter.post("/google-login", UserController.googleLoginController);
+
+/*
+Refresh Token Route
+*/
+userRouter.post("/refresh-token", UserController.refreshTokenController);
 export default userRouter;
