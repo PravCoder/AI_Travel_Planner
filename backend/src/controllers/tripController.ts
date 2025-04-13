@@ -240,3 +240,47 @@ export const testGetDaysFromTrip = async (req: Request, res: Response): Promise<
     res.status(500).json({ message: "Error getting days from trip" });
   }
 };
+
+/**
+ * Get all trips for a specific user
+ */
+export const getTripsForUser = async (req: Request, res: Response): Promise<void> => {
+  try {
+    const { userID } = req.params;
+    
+    // Find all trips for the user
+    const trips = await TripModel.find({ userId: userID });
+    
+    res.status(200).json(trips);
+  } catch (error) {
+    console.error("Error fetching trips for user:", error);
+    res.status(500).json({ error: "Failed to fetch trips for user" });
+  }
+};
+
+/**
+ * Get a trip by its ID
+ */
+export const getTripById = async (req: Request, res: Response): Promise<void> => {
+  try {
+    const { tripID } = req.params;
+    
+    if (!tripID) {
+      res.status(400).json({ error: 'Trip ID is required' });
+      return;
+    }
+    
+    // Find the trip
+    const trip = await TripModel.findById(tripID);
+    
+    if (!trip) {
+      res.status(404).json({ error: 'Trip not found' });
+      return;
+    }
+    
+    res.status(200).json(trip);
+  } catch (error) {
+    console.error("Error fetching trip:", error);
+    res.status(500).json({ error: "Failed to fetch trip" });
+  }
+};

@@ -55,39 +55,28 @@ export default function Dashboard() {
   useEffect(() => {
     const fetchTrips = async () => {
       try {
-        const mockTrips: Trip[] = [
-          {
-            id: "1",
-            title: "Paris Getaway",
-            description: "A romantic week in Paris",
-            startDate: new Date("2023-06-15"),
-            endDate: new Date("2023-06-22"),
-            imageUrl:
-              "https://images.pexels.com/photos/532826/pexels-photo-532826.jpeg",
-            isFavorite: true,
-          },
-          {
-            id: "2",
-            title: "Tokyo Adventure",
-            description: "Exploring the vibrant city of Tokyo",
-            startDate: new Date("2023-08-10"),
-            endDate: new Date("2023-08-20"),
-            imageUrl: "https://i.imgur.com/ELOjp7x.jpeg",
-            isFavorite: false,
-          },
-          {
-            id: "3",
-            title: "New York City",
-            description: "The Big Apple experience",
-            startDate: new Date("2023-09-05"),
-            endDate: new Date("2023-09-12"),
-            imageUrl:
-              "https://plus.unsplash.com/premium_photo-1672082422409-879d79636902?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8NXx8bmV3JTIweW9yayUyMGNpdHl8ZW58MHx8MHx8fDA%3D",
-            isFavorite: false,
-          },
-        ];
+        const userID = getCurrentUser();
 
-        setTrips(mockTrips);
+        // Fetch trips from API
+        const response = await axios.get(
+          `http://localhost:3001/trip/get-trips/${userID}`
+        );
+
+        // Transform API data to match Trip interface
+        const apiTrips = response.data.map((trip: any) => ({
+          id: trip._id,
+          title: trip.title || "Untitled Trip",
+          description: trip.description || "",
+          startDate: trip.startDate ? new Date(trip.startDate) : null,
+          endDate: trip.endDate ? new Date(trip.endDate) : null,
+          imageUrl:
+            trip.imageUrl ||
+            "https://images.pexels.com/photos/2325446/pexels-photo-2325446.jpeg",
+          isFavorite: trip.isFavorite || false,
+        }));
+
+        setTrips(apiTrips);
+
         setLoading(false);
       } catch (error) {
         console.error("Error fetching trips:", error);

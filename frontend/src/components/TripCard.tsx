@@ -46,15 +46,15 @@ const TripCard: React.FC<TripCardProps> = ({
   onShare,
   viewMode,
 }) => {
-  const formatDateRange = (start: Date, end: Date) => {
+  const formatDateRange = (start: Date | null, end: Date | null) => {
+    if (!start || !end) return "Dates not set";
     return `${format(start, "MMM d")} - ${format(end, "MMM d, yyyy")}`;
   };
 
   // Function to handle card click - will be used for navigation to trip details
   const handleCardClick = () => {
     console.log(`Navigating to trip details for: ${trip.id}`);
-    // In the future, this would navigate to the trip details page
-    // navigate(`/trips/${trip.id}`);
+    window.location.href = `/create-trip/${trip.id}`;
   };
 
   return (
@@ -90,7 +90,19 @@ const TripCard: React.FC<TripCardProps> = ({
               alignItems: "flex-start",
             }}
           >
-            <Typography gutterBottom variant="h5" component="div">
+            <Typography
+              gutterBottom
+              variant="h5"
+              component="div"
+              onClick={handleCardClick}
+              sx={{
+                cursor: "pointer",
+                "&:hover": {
+                  textDecoration: "underline",
+                  color: "primary.main",
+                },
+              }}
+            >
               {trip.title}
             </Typography>
             <IconButton

@@ -41,6 +41,42 @@ const CreateTripPage: React.FC = () => {
     travelers: 1,
   });
 
+  // Load trip data if tripID is provided
+  useEffect(() => {
+    const fetchTripData = async () => {
+      try {
+        if (!tripID) return;
+
+        console.log("Fetching trip data for ID:", tripID);
+        const response = await axios.get(
+          `${API_BASE_URL}/trip/get-trip/${tripID}`
+        );
+        const tripData = response.data;
+
+        console.log("Trip data loaded:", tripData);
+
+        // Update trip parameters with loaded data
+        setTripParameters({
+          location: tripData.city || tripData.country || "",
+          tripType: tripData.tripType || "",
+          startDate: tripData.startDate ? new Date(tripData.startDate) : null,
+          endDate: tripData.endDate ? new Date(tripData.endDate) : null,
+          budget: tripData.budget || "medium",
+          travelers: tripData.numTravelers || 1,
+        });
+
+        // If there is OpenAI-generated data, set it as tripPlan
+        if (tripData.destination && tripData.days) {
+          setTripPlan(tripData);
+        }
+      } catch (error) {
+        console.error("Error loading trip data:", error);
+      }
+    };
+
+    fetchTripData();
+  }, [tripID]);
+
   // Chat messages state
   const [messages, setMessages] = useState<ChatMessageType[]>([]);
   const [isLoading, setIsLoading] = useState(false);
@@ -122,6 +158,16 @@ const CreateTripPage: React.FC = () => {
 
       return updated;
     });
+  };
+
+  const handleSaveTrip = async () => {
+    try {
+      const response = await axios.post(`${API_BASE_URL}/trip/save`, {
+        tripParameters,
+      });
+    } catch (error) {
+      console.error("Error saving trip:", error);
+    }
   };
 
   // Format trip plan for display in chat
@@ -381,7 +427,8 @@ const CreateTripPage: React.FC = () => {
         }}
       >
         <Typography variant="h5" component="h1" fontWeight="bold">
-          New Trip - {tripID}
+          {tripID ? "Edit Trip" : "New Trip"}{" "}
+          {tripID ? `#${tripID.slice(-6)}` : ""}
         </Typography>
 
         {/* Trip parameters in the center */}
@@ -392,7 +439,7 @@ const CreateTripPage: React.FC = () => {
 
         <Box sx={{ display: "flex", gap: 1 }}>
           <Button variant="outlined" size="small" startIcon={<SaveIcon />}>
-            Save to Dashboard
+            Save
           </Button>
           <Button variant="outlined" size="small" startIcon={<ShareIcon />}>
             Share
