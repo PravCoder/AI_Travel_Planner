@@ -1,95 +1,67 @@
-import mongoose, { Document, Model, Schema } from 'mongoose';
+import mongoose, { Schema, Document, Model } from "mongoose";
 
-// Activity within a trip
-interface IActivity {
-  name: string;
-  description: string;
-  location: string;
-  category: string; // Food, Outdoor, Cultural, etc.
-  price: number; // 1-5 price level
-  rating?: number;
-  reviewCount?: number;
-  imageUrl?: string;
-  businessUrl?: string;
-  yelpId?: string;
-  tags: string[];
-  dateTime?: string;
-  duration?: number;
-}
-
-// Day plan within a trip
-interface IDayPlan {
-  date: string;
-  activities: IActivity[];
-  notes?: string;
-}
-
-// Trip document interface
-export interface ITrip extends Document {
-  userId: mongoose.Types.ObjectId;
-  destination: string;
-  startDate?: Date;
-  endDate?: Date;
-  days: IDayPlan[];
+// define the interface for the Trip schema 
+interface ITrip extends Document {
+  title: string;
+  startDate: Date; 
+  endDate: Date;
+  numTravelers: number;
+  budget_num:number,
   budget: string;
-  travelers: number;
-  summary: string;
-  tags: string[];
-  createdAt: Date;
-  updatedAt: Date;
+  currentCost: number;
+  country: string;
+  city: string;
+  destinations: Schema.Types.ObjectId[]; //array of destination objects
+  address: string;
+  location: {
+    type: string;
+    coordinates: [number, number];
+  };
 }
 
-// Trip parameters (for request/response)
+// define the schema for the Trip
+const TripSchema: Schema<ITrip> = new Schema(
+  {
+    title: { type: String, required: false, default:"Untitled Trip", unique:false },
+    startDate: { type: Date, required: false,unique:false  }, 
+    endDate: { type: Date, required: false, unique:false  },
+    numTravelers: { type: Number, required: false, unique:false  }, 
+    budget_num: { type: Number, required: false, unique:false  }, 
+    budget: { type: String, required: false, unique:false  }, 
+    currentCost: { type: Number, required: false, unique:false  }, 
+    country: { type: String, required: false, unique:false  }, 
+    city: { type: String, required: false, unique:false  }, 
+    destinations: [{ type: Schema.Types.ObjectId, ref: "Destination" }], 
+    address: { type: String, required: false, unique:false  },
+    location: {
+      type: {
+        type: String,
+        enum: ['Point'], 
+        required: false
+      },
+      coordinates: {
+        type: [Number],
+        required: false
+      }
+    },
+  },
+);
+
+
+// Trip parameters (for request/response) TBD:  need to to update this
 export interface TripParameters {
-  location: string;
+  location?: string;
+  tripType?: string;
   startDate: Date | null;
   endDate: Date | null;
   budget: string;
   travelers: number;
 }
 
-// Trip schema
-const TripSchema: Schema<ITrip> = new Schema(
-  {
-    userId: { type: Schema.Types.ObjectId, ref: 'User', required: true },
-    destination: { type: String, required: true },
-    startDate: { type: Date },
-    endDate: { type: Date },
-    days: [
-      {
-        date: { type: String, required: true },
-        activities: [
-          {
-            name: { type: String, required: true },
-            description: { type: String },
-            location: { type: String },
-            category: { type: String },
-            price: { type: Number, min: 1, max: 5 },
-            rating: { type: Number },
-            reviewCount: { type: Number },
-            imageUrl: { type: String },
-            businessUrl: { type: String },
-            yelpId: { type: String },
-            tags: [{ type: String }],
-            dateTime: { type: String },
-            duration: { type: Number },
-          },
-        ],
-        notes: { type: String },
-      },
-    ],
-    budget: {
-      type: String,
-      enum: ['budget', 'economy', 'medium', 'premium', 'luxury'],
-    },
-    travelers: { type: Number, required: true },
-    summary: { type: String },
-    tags: [{ type: String }],
-  },
-  { timestamps: true }
-);
+// Add a geospatial index for location-based queries
+TripSchema.index({ location: '2dsphere' });
 
-// Trip model
-const TripModel: Model<ITrip> = mongoose.model<ITrip>('Trip', TripSchema);
+// define the model using the interface and schema
+const TripModel: Model<ITrip> = mongoose.model<ITrip>("Trip", TripSchema);
 
 export default TripModel;

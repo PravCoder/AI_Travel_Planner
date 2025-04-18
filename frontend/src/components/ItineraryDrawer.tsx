@@ -26,15 +26,47 @@ import HotelIcon from "@mui/icons-material/Hotel";
 import LocationOnIcon from "@mui/icons-material/LocationOn";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import ExpandLessIcon from "@mui/icons-material/ExpandLess";
-import DrawerHeader from "./DrawerHeader";
-import { TripParameters } from "./CompactTripParameters";
+import DirectionsCarIcon from "@mui/icons-material/DirectionsCar";
+import ExploreIcon from "@mui/icons-material/Explore";
+import { TripParametersData } from "./TripParameters";
+
+// Add interface for the trip plan data matching the OpenAI response
+interface TripPlanActivity {
+  name: string;
+  description: string;
+  location: string;
+  category: string;
+  price: number;
+  time: string;
+  tags: string[];
+}
+
+interface TripPlanDay {
+  date: string;
+  hotel: string;
+  activities: TripPlanActivity[];
+  notes?: string;
+}
+
+interface TripPlan {
+  destination: string;
+  title: string;
+  startDate: string | null;
+  endDate: string | null;
+  days: TripPlanDay[];
+  budget: string;
+  travelers: number;
+  summary: string;
+  tags: string[];
+}
 
 interface ItineraryDrawerProps {
   open: boolean;
   onClose: () => void;
-  tripParameters: TripParameters;
+  tripParameters: TripParametersData;
   onSideChange?: (side: "left" | "right") => void;
   onCollapseSidebar?: () => void;
+  tripPlan?: TripPlan; // Add tripPlan prop
 }
 
 // Activity type with category for icons
@@ -45,24 +77,6 @@ type ActivityCategory =
   | "accommodation"
   | "general";
 
-interface Activity {
-  time: string;
-  activity: string;
-  category: ActivityCategory;
-  description?: string;
-  cost?: string;
-}
-
-// Day interface to ensure type safety
-interface ItineraryDay {
-  day: number;
-  date: string;
-  location: string;
-  activities: Activity[];
-  accommodationDetails: string;
-  weatherForecast: string;
-}
-
 // Add a constant for the sidebar widths
 const SIDEBAR_COLLAPSED_WIDTH = 65; // Width in pixels when collapsed
 
@@ -72,13 +86,69 @@ const ItineraryDrawer: React.FC<ItineraryDrawerProps> = ({
   tripParameters,
   onSideChange,
   onCollapseSidebar,
+  tripPlan,
 }) => {
   const theme = useTheme();
   const [drawerSide, setDrawerSide] = useState<"left" | "right">("right");
-  const [expandedDays, setExpandedDays] = useState<Record<number, boolean>>({
-    1: true,
-    2: true,
-  });
+  const [expandedDays, setExpandedDays] = useState<Record<number, boolean>>({});
+
+  // Map OpenAI category to our icons
+  const mapCategoryToIcon = (category: string): ActivityCategory => {
+    const lowerCategory = category.toLowerCase();
+    if (
+      lowerCategory.includes("food") ||
+      lowerCategory.includes("restaurant") ||
+      lowerCategory.includes("dining") ||
+      lowerCategory.includes("cafe") ||
+      lowerCategory.includes("breakfast") ||
+      lowerCategory.includes("lunch") ||
+      lowerCategory.includes("dinner")
+    ) {
+      return "food";
+    } else if (
+      lowerCategory.includes("hotel") ||
+      lowerCategory.includes("accommodation") ||
+      lowerCategory.includes("stay") ||
+      lowerCategory.includes("lodging") ||
+      lowerCategory.includes("resort")
+    ) {
+      return "accommodation";
+    } else if (
+      lowerCategory.includes("transport") ||
+      lowerCategory.includes("car") ||
+      lowerCategory.includes("bus") ||
+      lowerCategory.includes("taxi") ||
+      lowerCategory.includes("drive") ||
+      lowerCategory.includes("train") ||
+      lowerCategory.includes("flight") ||
+      lowerCategory.includes("transit")
+    ) {
+      return "transport";
+    } else if (
+      lowerCategory.includes("attraction") ||
+      lowerCategory.includes("tour") ||
+      lowerCategory.includes("visit") ||
+      lowerCategory.includes("sightseeing") ||
+      lowerCategory.includes("explore") ||
+      lowerCategory.includes("hiking") ||
+      lowerCategory.includes("museum")
+    ) {
+      return "attraction";
+    } else {
+      return "general";
+    }
+  };
+
+  // Initialize expanded days based on tripPlan data
+  useEffect(() => {
+    if (tripPlan?.days) {
+      const expanded: Record<number, boolean> = {};
+      tripPlan.days.forEach((_, index) => {
+        expanded[index + 1] = index < 2; // Expand first two days by default
+      });
+      setExpandedDays(expanded);
+    }
+  }, [tripPlan]);
 
   // Notify parent to collapse sidebar when drawer opens
   useEffect(() => {
@@ -114,13 +184,18 @@ const ItineraryDrawer: React.FC<ItineraryDrawerProps> = ({
         return <DirectionsWalkIcon fontSize="small" />;
       case "accommodation":
         return <HotelIcon fontSize="small" />;
+      case "transport":
+        return <DirectionsCarIcon fontSize="small" />;
+      case "general":
+        return <ExploreIcon fontSize="small" />;
       default:
-        return null;
+        return <ExploreIcon fontSize="small" />;
     }
   };
 
+  /*
   // Enhanced mock itinerary data with categories and locations
-  const itineraryDays: ItineraryDay[] = [
+  const mockItineraryDays: ItineraryDay[] = [
     {
       day: 1,
       date: "Monday, June 12, 2023",
@@ -215,6 +290,30 @@ const ItineraryDrawer: React.FC<ItineraryDrawerProps> = ({
       weatherForecast: "Partly Cloudy, 72°F",
     },
   ];
+  */
+
+  // Convert tripPlan to itineraryDays format
+  const itineraryDays = tripPlan?.days?.map((day, index) => {
+    // Extract location from first activity, or use destination
+    const location = day.activities[0]?.location || tripPlan.destination;
+
+    return {
+      day: index + 1,
+      date: day.date,
+      location: location,
+      activities: day.activities.map((activity) => ({
+        activity: activity.name,
+        description: activity.description,
+        location: activity.location,
+        category: mapCategoryToIcon(activity.category),
+        price: `${activity.price}`,
+        time: activity.time,
+        tags: activity.tags,
+      })),
+      hotel: day.hotel,
+      weatherForecast: "Weather information currently not available",
+    };
+  });
 
   return (
     <Drawer
@@ -314,10 +413,12 @@ const ItineraryDrawer: React.FC<ItineraryDrawerProps> = ({
         >
           <Box>
             <Typography variant="h5" component="div" fontWeight="bold">
-              Your Itinerary
+              {tripPlan?.title || "Your Itinerary"}
             </Typography>
             <Typography variant="subtitle1">
-              {tripParameters.location || "Destination"}
+              {tripPlan?.destination ||
+                tripParameters.location ||
+                "Destination"}
             </Typography>
           </Box>
           <Box>
@@ -343,14 +444,20 @@ const ItineraryDrawer: React.FC<ItineraryDrawerProps> = ({
           <Chip
             icon={<CalendarTodayIcon />}
             label={`${
-              tripParameters.startDate?.toLocaleDateString() || "Start date"
-            } - ${tripParameters.endDate?.toLocaleDateString() || "End date"}`}
+              tripPlan?.startDate ||
+              tripParameters.startDate?.toLocaleDateString() ||
+              "Start date"
+            } - ${
+              tripPlan?.endDate ||
+              tripParameters.endDate?.toLocaleDateString() ||
+              "End date"
+            }`}
             size="small"
             sx={{ bgcolor: "rgba(255,255,255,0.2)", color: "inherit" }}
           />
           <Chip
             icon={<LocalOfferIcon />}
-            label={`Budget: ${tripParameters.budget}`}
+            label={`Budget: ${tripPlan?.budget || tripParameters.budget}`}
             size="small"
             sx={{ bgcolor: "rgba(255,255,255,0.2)", color: "inherit" }}
           />
@@ -423,7 +530,9 @@ const ItineraryDrawer: React.FC<ItineraryDrawerProps> = ({
               letterSpacing: "0.5px",
             }}
           >
-            Your Adventure Awaits!
+            {itineraryDays?.length
+              ? "Your Adventure Awaits!"
+              : "Get started planning your trip!"}
           </Typography>
           <Typography
             variant="body1"
@@ -432,14 +541,29 @@ const ItineraryDrawer: React.FC<ItineraryDrawerProps> = ({
               fontWeight: "medium",
             }}
           >
-            We've crafted an amazing {itineraryDays.length}-day experience in{" "}
-            {tripParameters.location || "your destination"}. This itinerary has
-            been personalized based on your preferences and travel style.
+            {itineraryDays?.length ? (
+              <>
+                We've crafted an amazing {itineraryDays.length}-day experience
+                in{" "}
+                {tripPlan?.destination ||
+                  tripParameters.location ||
+                  "your destination"}
+                .
+                {tripPlan?.summary
+                  ? ` ${tripPlan.summary}`
+                  : " This itinerary has been personalized based on your preferences and travel style."}
+              </>
+            ) : (
+              <>
+                Once you've provided your travel preferences, your itinerary
+                will be generated and displayed here!
+              </>
+            )}
           </Typography>
         </Paper>
 
         {/* Day-by-day itinerary */}
-        {itineraryDays.map((day) => (
+        {itineraryDays?.map((day) => (
           <Paper
             key={day.day}
             elevation={2}
@@ -529,7 +653,7 @@ const ItineraryDrawer: React.FC<ItineraryDrawerProps> = ({
               <Box sx={{ display: "flex", alignItems: "center" }}>
                 <HotelIcon sx={{ mr: 1, color: "primary.main" }} />
                 <Typography variant="body2" fontWeight="medium">
-                  {day.accommodationDetails}
+                  {day.hotel}
                 </Typography>
               </Box>
             </Box>
@@ -588,9 +712,9 @@ const ItineraryDrawer: React.FC<ItineraryDrawerProps> = ({
                             {item.description}
                           </Typography>
                         )}
-                        {item.cost && (
+                        {item.price && (
                           <Chip
-                            label={item.cost}
+                            label={item.price}
                             size="small"
                             sx={{ mt: 1, fontSize: "0.7rem" }}
                             variant="outlined"
@@ -618,35 +742,38 @@ const ItineraryDrawer: React.FC<ItineraryDrawerProps> = ({
                 }}
               >
                 <Typography variant="body2" fontStyle="italic">
-                  Enjoy your day in {day.location}! All activities have been
-                  arranged with your preferences in mind.
+                  {tripPlan?.days?.[day.day - 1]?.notes ||
+                    `Enjoy your day in ${day.location}! All activities have been arranged with your preferences in mind.`}
                 </Typography>
               </Box>
             </Collapse>
           </Paper>
         ))}
 
-        {/* Final notes */}
-        <Paper
-          elevation={1}
-          sx={{
-            p: 2.5,
-            mb: 3,
-            borderRadius: 2,
-            bgcolor:
-              theme.palette.mode === "dark"
-                ? "rgba(255,255,255,0.03)"
-                : "rgba(0,0,0,0.02)",
-            border: "1px dashed",
-            borderColor: "divider",
-          }}
-        >
-          <Typography variant="body2" color="text.secondary">
-            This itinerary is flexible and can be adjusted as needed. All
-            reservations have been confirmed. Please keep a digital or printed
-            copy of this itinerary during your travels.
-          </Typography>
-        </Paper>
+        {itineraryDays?.length ? (
+          <Paper
+            elevation={1}
+            sx={{
+              p: 2.5,
+              mb: 3,
+              borderRadius: 2,
+              bgcolor:
+                theme.palette.mode === "dark"
+                  ? "rgba(255,255,255,0.03)"
+                  : "rgba(0,0,0,0.02)",
+              border: "1px dashed",
+              borderColor: "divider",
+            }}
+          >
+            <Typography variant="body2" color="text.secondary">
+              This itinerary is flexible and can be adjusted as needed. All
+              reservations have been confirmed. Please keep a digital or printed
+              copy of this itinerary during your travels.
+            </Typography>
+          </Paper>
+        ) : (
+          ""
+        )}
       </Box>
     </Drawer>
   );

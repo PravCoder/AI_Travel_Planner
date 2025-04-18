@@ -1,8 +1,8 @@
 import express, { Request, Response, Router } from 'express';
 import OpenAI from 'openai';
-import { hashPassword } from '../functions/Password';
+import { hashPassword } from '../Functions/Password';
 import UserModel from '../models/User';
-
+import * as UserController from "../controllers/userController";
 const userRouter: Router = express.Router();
 
 // Initialize OpenAI
@@ -121,4 +121,33 @@ userRouter.post('/register', registerUser);
 userRouter.post('/generate-itinerary', generateItinerary);
 userRouter.post('/chat', chatWithOpenAI);
 
+/*
+ * POSTMAN REQUEST URL: http://localhost:3001/user/register
+ * JSON BODY:
+ * {
+ *   "username": "testUser",
+ *   "email": "test@example.com",
+ *   "password": "SecurePass123"
+ * }
+ */
+
+/**
+ * Register Route
+*/
+userRouter.post("/register", UserController.registerController);
+
+/**
+ * Login Route
+*/
+userRouter.post("/login", UserController.loginController);
+
+/*
+Google Login Route
+*/
+userRouter.post("/google-login", UserController.googleLoginController);
+
+/*
+Refresh Token Route
+*/
+userRouter.post("/refresh-token", UserController.refreshTokenController);
 export default userRouter;

@@ -5,7 +5,7 @@ import mongoose from 'mongoose';
 dotenv.config(); // Load environment variables
 
 // Import routers
-import tripRouter from './routes/tripRoutes';
+import tripRouter from './routes/trip_routes';
 import userRouter from './routes/user_routes';
 
 const app = express(); // Create Express app
@@ -16,7 +16,7 @@ app.use(cors()); // Enable CORS
 app.use('/user', userRouter);
 app.use('/trip', tripRouter);
 
-// Connect to MongoDB
+// Connect to MongoDB and make sure server is running on port 3001
 mongoose
   .connect(
     'mongodb+srv://admin:djbeg123*@aitravelplannercluster.96bpw.mongodb.net/?retryWrites=true&w=majority&appName=aitravelplannercluster'

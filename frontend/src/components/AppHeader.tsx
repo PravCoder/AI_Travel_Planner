@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { styled } from "@mui/material/styles";
 import MuiAppBar, { AppBarProps as MuiAppBarProps } from "@mui/material/AppBar";
 import Toolbar from "@mui/material/Toolbar";
@@ -8,6 +8,7 @@ import MenuIcon from "@mui/icons-material/Menu";
 import Brightness4Icon from "@mui/icons-material/Brightness4";
 import Brightness7Icon from "@mui/icons-material/Brightness7";
 import { useThemeContext } from "../context/ThemeContext";
+import { TokenHelper } from "../utils/TokenHelper";
 
 // Define the drawer width (should match the one in SideNav)
 const drawerWidth = 240;
@@ -50,6 +51,17 @@ interface AppHeaderProps {
  */
 const AppHeader: React.FC<AppHeaderProps> = ({ open, handleDrawerOpen }) => {
   const { mode, toggleColorMode } = useThemeContext();
+  const [userEmail, setUserEmail] = useState<string | null>(null);
+
+  useEffect(() => {
+    const token = TokenHelper.getToken();
+    if (token) {
+      const decoded = TokenHelper.decodeToken(token);
+      setUserEmail(decoded?.email || null);
+    } else {
+      setUserEmail(null);
+    }
+  }, []);
 
   return (
     <AppBar position="fixed" open={open}>
@@ -67,7 +79,7 @@ const AppHeader: React.FC<AppHeaderProps> = ({ open, handleDrawerOpen }) => {
           <MenuIcon />
         </IconButton>
         <Typography variant="h6" noWrap component="div" sx={{ flexGrow: 1 }}>
-          AI Travel Planner
+          AI Travel Planner - Current User: {userEmail || 'Not logged in'}
         </Typography>
         <IconButton sx={{ ml: 1 }} onClick={toggleColorMode} color="inherit">
           {mode === "dark" ? <Brightness7Icon /> : <Brightness4Icon />}

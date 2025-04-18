@@ -24,8 +24,9 @@ import AttachMoneyIcon from "@mui/icons-material/AttachMoney";
 import PeopleIcon from "@mui/icons-material/People";
 
 // Define the parameters interface
-export interface TripParameters {
-  location: string;
+export interface TripParametersData {
+  location?: string;
+  tripType?: string;
   startDate: Date | null;
   endDate: Date | null;
   budget: string;
@@ -33,18 +34,18 @@ export interface TripParameters {
 }
 
 // Component props
-export interface CompactTripParametersProps {
-  parameters: TripParameters;
-  onParametersChange: (params: Partial<TripParameters>) => void;
+export interface TripParametersProps {
+  parameters: TripParametersData;
+  onParametersChange: (params: Partial<TripParametersData>) => void;
 }
 
 /**
- * CompactTripParameters Component
+ * TripParameters Component
  *
- * A compact, centered parameters bar with clickable sections
+ * A centered parameters bar with clickable sections
  * that open popover editors for each parameter
  */
-const CompactTripParameters: React.FC<CompactTripParametersProps> = ({
+const TripParameters: React.FC<TripParametersProps> = ({
   parameters,
   onParametersChange,
 }) => {
@@ -384,5 +385,4 @@ const CompactTripParameters: React.FC<CompactTripParametersProps> = ({
     </Paper>
   );
 };
-
-export default CompactTripParameters;
+export default TripParameters;

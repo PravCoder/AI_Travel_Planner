@@ -7,7 +7,6 @@ import {
   ButtonGroup,
   Grid,
   Container,
-  Paper,
 } from "@mui/material";
 import ViewModuleIcon from "@mui/icons-material/ViewModule";
 import ViewListIcon from "@mui/icons-material/ViewList";
@@ -15,7 +14,8 @@ import AddIcon from "@mui/icons-material/Add";
 import TripCard from "../components/TripCard";
 import { Trip } from "../types/trip";
 import { useNavigate } from "react-router-dom";
-import Chat from "../components/Chat";
+import axios from "axios";
+import getCurrentUser from "../hooks/getCurrentUser";
 
 const DashboardHeader = styled(Box)(({ theme }) => ({
   display: "flex",
@@ -30,42 +30,53 @@ export default function Dashboard() {
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
 
+  // this function is called when new trip button is clicked
+  const handleNewTrip = async () => {
+    // Replace with dynamic user ID
+    const userID = getCurrentUser();
+
+    // send request to trip-route /create-trip to create emptry tip object saved to user.trips.
+    try {
+      const response = await axios.post(
+        "http://localhost:3001/trip/create-trip",
+        {
+          userID,
+        }
+      );
+      console.log("Trip created:", response.data);
+
+      // redirect to create-trip of the trip object id with just created which was returned in the response of this request
+      navigate(`/create-trip/${response.data.tripID}`);
+    } catch (error) {
+      console.error("Error creating trip:", error);
+    }
+  };
+
   useEffect(() => {
     const fetchTrips = async () => {
       try {
-        const mockTrips: Trip[] = [
-          {
-            id: "1",
-            title: "Paris Getaway",
-            description: "A romantic week in Paris",
-            startDate: new Date("2023-06-15"),
-            endDate: new Date("2023-06-22"),
-            imageUrl:
-              "https://images.pexels.com/photos/532826/pexels-photo-532826.jpeg",
-            isFavorite: true,
-          },
-          {
-            id: "2",
-            title: "Tokyo Adventure",
-            description: "Exploring the vibrant city of Tokyo",
-            startDate: new Date("2023-08-10"),
-            endDate: new Date("2023-08-20"),
-            imageUrl: "https://i.imgur.com/ELOjp7x.jpeg",
-            isFavorite: false,
-          },
-          {
-            id: "3",
-            title: "New York City",
-            description: "The Big Apple experience",
-            startDate: new Date("2023-09-05"),
-            endDate: new Date("2023-09-12"),
-            imageUrl:
-              "https://plus.unsplash.com/premium_photo-1672082422409-879d79636902?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8NXx8bmV3JTIweW9yayUyMGNpdHl8ZW58MHx8MHx8fDA%3D",
-            isFavorite: false,
-          },
-        ];
+        const userID = getCurrentUser();
 
-        setTrips(mockTrips);
+        // Fetch trips from API
+        const response = await axios.get(
+          `http://localhost:3001/trip/get-trips/${userID}`
+        );
+
+        // Transform API data to match Trip interface
+        const apiTrips = response.data.map((trip: any) => ({
+          id: trip._id,
+          title: trip.title || "Untitled Trip",
+          description: trip.description || "",
+          startDate: trip.startDate ? new Date(trip.startDate) : null,
+          endDate: trip.endDate ? new Date(trip.endDate) : null,
+          imageUrl:
+            trip.imageUrl ||
+            "https://images.pexels.com/photos/2325446/pexels-photo-2325446.jpeg",
+          isFavorite: trip.isFavorite || false,
+        }));
+
+        setTrips(apiTrips);
+
         setLoading(false);
       } catch (error) {
         console.error("Error fetching trips:", error);
@@ -76,9 +87,9 @@ export default function Dashboard() {
     fetchTrips();
   }, []);
 
-  const handleAddTrip = () => {
-    navigate("/create-trip");
-  };
+  // const handleAddTrip = () => {
+  //   navigate("/create-trip");
+  // };
 
   const handleToggleFavorite = (tripId: string) => {
     setTrips(
@@ -121,11 +132,12 @@ export default function Dashboard() {
               <ViewListIcon />
             </Button>
           </ButtonGroup>
+
           <Button
             variant="contained"
             color="primary"
             startIcon={<AddIcon />}
-            onClick={handleAddTrip}
+            onClick={handleNewTrip}
           >
             New Trip
           </Button>
@@ -164,14 +176,6 @@ export default function Dashboard() {
           ))}
         </Grid>
       )}
-
-      {/* 👇 Chat section added below the trips */}
-      <Paper elevation={3} sx={{ mt: 6, p: 3 }}>
-        <Typography variant="h5" gutterBottom>
-          Need help planning your next trip?
-        </Typography>
-        <Chat />
-      </Paper>
     </Container>
   );
 }

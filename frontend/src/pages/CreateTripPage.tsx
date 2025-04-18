@@ -1,24 +1,18 @@
-import {
-  Box,
-  Button,
-  Grid,
-  IconButton,
-  Paper,
-  Typography,
-  useTheme,
-} from "@mui/material";
-import { v4 as uuidv4 } from "uuid";
-import { useSearchParams } from "react-router-dom";
-import { TripParameters } from "../components/CompactTripParameters";
-import CompactTripParameters from "../components/CompactTripParameters";
-import ChatInterface, { ChatMessageType } from "../components/ChatInterface";
-import MapIntegration from "../components/MapIntegration";
 import FormatListBulletedIcon from "@mui/icons-material/FormatListBulleted";
 import SaveIcon from "@mui/icons-material/Save";
 import ShareIcon from "@mui/icons-material/Share";
-import ItineraryDrawer from "../components/ItineraryDrawer";
+import { Box, Button, Grid, Paper, Typography, useTheme } from "@mui/material";
 import axios from "axios";
 import React, { useCallback, useEffect, useRef, useState } from "react";
+import { useSearchParams } from "react-router-dom";
+import { v4 as uuidv4 } from "uuid";
+import ChatInterface, { ChatMessageType } from "../components/ChatInterface";
+import TripParameters, {
+  TripParametersData,
+} from "../components/TripParameters";
+import ItineraryDrawer from "../components/ItineraryDrawer";
+import MapIntegration from "../components/MapIntegration";
+import { useParams } from "react-router-dom";
 
 const API_BASE_URL = "http://localhost:3001"; // Use localhost for development
 
@@ -34,19 +28,58 @@ const CreateTripPage: React.FC = () => {
   const hasInitialized = useRef(false);
   const chatHistoryRef = useRef<Array<{ role: string; content: string }>>([]);
 
+  // get the trip-id-url parameter from the url
+  const { tripID } = useParams<{ tripID: string }>();
+
   // Trip parameters state - initialize with URL param if available
-  const [tripParameters, setTripParameters] = useState<TripParameters>({
+  const [tripParameters, setTripParameters] = useState<TripParametersData>({
     location: searchParams.get("destination") || "",
+    tripType: "",
     startDate: null,
     endDate: null,
-    budget: "budget",
+    budget: "medium",
     travelers: 1,
   });
+
+  // Load trip data if tripID is provided
+  useEffect(() => {
+    const fetchTripData = async () => {
+      try {
+        if (!tripID) return;
+
+        console.log("Fetching trip data for ID:", tripID);
+        const response = await axios.get(
+          `${API_BASE_URL}/trip/get-trip/${tripID}`
+        );
+        const tripData = response.data;
+
+        console.log("Trip data loaded:", tripData);
+
+        // Update trip parameters with loaded data
+        setTripParameters({
+          location: tripData.city || tripData.country || "",
+          tripType: tripData.tripType || "",
+          startDate: tripData.startDate ? new Date(tripData.startDate) : null,
+          endDate: tripData.endDate ? new Date(tripData.endDate) : null,
+          budget: tripData.budget || "medium",
+          travelers: tripData.numTravelers || 1,
+        });
+
+        // If there is OpenAI-generated data, set it as tripPlan
+        if (tripData.destination && tripData.days) {
+          setTripPlan(tripData);
+        }
+      } catch (error) {
+        console.error("Error loading trip data:", error);
+      }
+    };
+
+    fetchTripData();
+  }, [tripID]);
 
   // Chat messages state
   const [messages, setMessages] = useState<ChatMessageType[]>([]);
   const [isLoading, setIsLoading] = useState(false);
-  const [isReadyForPlanning, setIsReadyForPlanning] = useState(false);
 
   // TODO: might want to allow the chatbot to modify trip parameters if it gains new info through the chat
   // (e.g., if the user mentions a specific date or budget preference that differs from the initial input)
@@ -54,6 +87,7 @@ const CreateTripPage: React.FC = () => {
   // Itinerary drawer state
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [drawerSide, setDrawerSide] = useState<"left" | "right">("right");
+  const [tripPlan, setTripPlan] = useState<any>(null);
 
   // Function to collapse sidebar - this will be passed to the ItineraryDrawer
   const handleCollapseSidebar = () => {
@@ -66,7 +100,7 @@ const CreateTripPage: React.FC = () => {
   };
 
   // Handle parameter changes
-  const handleParameterChange = (newParams: Partial<TripParameters>) => {
+  const handleParameterChange = (newParams: Partial<TripParametersData>) => {
     setTripParameters((prev) => {
       const updated = { ...prev, ...newParams };
 
@@ -124,6 +158,16 @@ const CreateTripPage: React.FC = () => {
 
       return updated;
     });
+  };
+
+  const handleSaveTrip = async () => {
+    try {
+      const response = await axios.post(`${API_BASE_URL}/trip/save`, {
+        tripParameters,
+      });
+    } catch (error) {
+      console.error("Error saving trip:", error);
+    }
   };
 
   // Format trip plan for display in chat
@@ -188,6 +232,9 @@ const CreateTripPage: React.FC = () => {
       // Process the trip plan response
       console.log("Generated trip plan:", response.data);
 
+      // Store the trip plan data in state
+      setTripPlan(response.data);
+
       // Add success message
       const successMessage: ChatMessageType = {
         id: uuidv4(),
@@ -207,6 +254,9 @@ const CreateTripPage: React.FC = () => {
       };
 
       setMessages((prev) => [...prev, successMessage, tripSummaryMessage]);
+
+      // Open the itinerary drawer to show the plan
+      setDrawerOpen(true);
     } catch (error) {
       console.error("Error generating trip plan:", error);
 
@@ -241,7 +291,24 @@ const CreateTripPage: React.FC = () => {
     chatHistoryRef.current.push({ role: "user", content: messageText });
 
     try {
-      // Call the OpenAI API via our backend
+      // Check if we should directly generate a plan (trigger words in user message)
+      const planCommandRegex =
+        /(create|generate|make|show|give me).*(plan|itinerary|trip|schedule)/i;
+      const directPlanRequest = planCommandRegex.test(messageText);
+
+      // Only proceed with trip generation if we have at least a location or trip type
+      const canGeneratePlan =
+        directPlanRequest &&
+        (tripParameters.location || tripParameters.tripType);
+
+      if (canGeneratePlan) {
+        // Skip AI response and directly generate the plan
+        await generateTripPlan();
+        setIsLoading(true);
+        return;
+      }
+
+      // Regular chat flow
       const response = await axios.post(`${API_BASE_URL}/trip/chat`, {
         message: messageText,
         tripParameters,
@@ -250,35 +317,41 @@ const CreateTripPage: React.FC = () => {
 
       // Extract AI response
       const aiResponseText = response.data.reply;
-      const isReady = response.data.isReadyForPlanning;
+      const commandDetected = response.data.commandDetected;
 
-      // Update planning readiness if needed
-      if (isReady) {
-        setIsReadyForPlanning(true);
+      // Check if the AI detected a command to generate a plan
+      if (
+        commandDetected &&
+        (tripParameters.location || tripParameters.tripType)
+      ) {
+        // AI detected a plan generation command and we have minimum requirements
+        await generateTripPlan();
+      } else {
+        // Add AI response message
+        const aiMessage: ChatMessageType = {
+          id: uuidv4(),
+          text: aiResponseText,
+          sender: "ai",
+          timestamp: new Date(),
+        };
+
+        setMessages((prev) => [...prev, aiMessage]);
+
+        // Update chat history with AI response
+        chatHistoryRef.current.push({
+          role: "assistant",
+          content: aiResponseText,
+        });
       }
-
-      // Create and add AI message
-      const aiMessage: ChatMessageType = {
-        id: uuidv4(),
-        text: aiResponseText,
-        sender: "ai",
-        timestamp: new Date(),
-      };
-
-      setMessages((prev) => [...prev, aiMessage]);
-
-      // Update chat history with AI response
-      chatHistoryRef.current.push({
-        role: "assistant",
-        content: aiResponseText,
-      });
-    } catch (error) {
+    } catch (error: any) {
       console.error("Error getting AI response:", error);
 
-      // Add error message
+      // Add error message with specific error details if available
       const errorMessage: ChatMessageType = {
         id: uuidv4(),
-        text: "Sorry, I encountered an error. Please try again.",
+        text:
+          error.response?.data?.error ||
+          "Sorry, I encountered an error. Please try again.",
         sender: "ai",
         timestamp: new Date(),
       };
@@ -324,38 +397,6 @@ const CreateTripPage: React.FC = () => {
     setDrawerSide(side);
   };
 
-  // Listen for when user is ready to generate trip plan
-  useEffect(() => {
-    if (isReadyForPlanning) {
-      // Add a button or message prompting user to generate plan
-      const promptMessage: ChatMessageType = {
-        id: uuidv4(),
-        text: "I have enough information to create your trip plan. Would you like me to generate it now? Type 'yes' to proceed.",
-        sender: "ai",
-        timestamp: new Date(),
-      };
-
-      setMessages((prev) => [...prev, promptMessage]);
-      chatHistoryRef.current.push({
-        role: "assistant",
-        content: promptMessage.text,
-      });
-    }
-  }, [isReadyForPlanning]);
-
-  // Check for "yes" responses when ready for planning
-  useEffect(() => {
-    const lastMessage = messages[messages.length - 1];
-
-    if (
-      isReadyForPlanning &&
-      lastMessage?.sender === "user" &&
-      /^(yes|yeah|sure|ok|okay|generate|create|please)/i.test(lastMessage.text)
-    ) {
-      generateTripPlan();
-    }
-  }, [messages, isReadyForPlanning, generateTripPlan]);
-
   return (
     <Box
       sx={{
@@ -386,18 +427,19 @@ const CreateTripPage: React.FC = () => {
         }}
       >
         <Typography variant="h5" component="h1" fontWeight="bold">
-          New Trip
+          {tripID ? "Edit Trip" : "New Trip"}{" "}
+          {tripID ? `#${tripID.slice(-6)}` : ""}
         </Typography>
 
-        {/* Compact trip parameters in the center */}
-        <CompactTripParameters
+        {/* Trip parameters in the center */}
+        <TripParameters
           parameters={tripParameters}
           onParametersChange={handleParameterChange}
         />
 
         <Box sx={{ display: "flex", gap: 1 }}>
           <Button variant="outlined" size="small" startIcon={<SaveIcon />}>
-            Save to Dashboard
+            Save
           </Button>
           <Button variant="outlined" size="small" startIcon={<ShareIcon />}>
             Share
@@ -516,6 +558,7 @@ const CreateTripPage: React.FC = () => {
         tripParameters={tripParameters}
         onSideChange={handleDrawerSideChange}
         onCollapseSidebar={handleCollapseSidebar}
+        tripPlan={tripPlan}
       />
     </Box>
   );
