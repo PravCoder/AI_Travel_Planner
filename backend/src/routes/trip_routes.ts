@@ -9,11 +9,12 @@ import {
   getTripsForUser,
   getTripById
 } from '../controllers/tripController';
+import { rateLimitMiddleware } from '../services/rateLimitService';
 
 const router = express.Router();
 
-// Chat route
-router.post('/chat', chatWithTripPlanner);
+// Chat route with rate limiting
+router.post('/chat', rateLimitMiddleware, chatWithTripPlanner);
 
 // Trip generation routes, specifying type of request either post, get, etc
 router.post('/generate', generateTripPlan);
