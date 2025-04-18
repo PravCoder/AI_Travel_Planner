@@ -132,6 +132,8 @@ export async function generateStructuredTripPlan(
   conversationContext: string[] = []
 ): Promise<any> {
   try {
+    const nonce = Math.floor(Math.random() * 1e6); // generate a random challenge key
+
     // Ensure we have either a location or trip type
     if (!parameters.location && !parameters.tripType) {
       throw new Error("Either location or trip type must be specified");
@@ -187,11 +189,14 @@ Return ONLY the JSON with no additional text before or after it.`,
     messages.push({
       role: "user",
       content: `Generate a detailed trip plan ${
-        parameters.location
-          ? `for ${parameters.location}`
-          : `for a ${parameters.tripType} trip`
-      }. Make reasonable assumptions for any missing details and create an exciting itinerary.`,
+          parameters.location
+              ? `for ${parameters.location}`
+              : `for a ${parameters.tripType} trip`
+      }. Make reasonable assumptions for any missing details and create an exciting itinerary.
+
+        IMPORTANT: Include this verification number in your JSON response exactly as-is under a field called "nonce": ${nonce}`
     });
+
 
     // Call OpenAI with the specified model and structured output format
     const response = await openai.chat.completions.create({
@@ -318,6 +323,10 @@ Return ONLY the JSON with no additional text before or after it.`,
                   type: "string",
                 },
               },
+              nonce:{
+                type: "integer",
+                description: "Verification number echoed from the prompt"
+              }
             },
             required: [
               "destination",
@@ -327,6 +336,7 @@ Return ONLY the JSON with no additional text before or after it.`,
               "travelers",
               "summary",
               "tags",
+              "nonce",
             ],
           },
         },
@@ -342,6 +352,15 @@ Return ONLY the JSON with no additional text before or after it.`,
     // Parse the JSON response
     try {
       const parsedResponse = JSON.parse(content);
+
+      // Verify integrity of response
+      if (parsedResponse.nonce !== nonce) {
+        console.error(`Nonce mismatch: expected ${nonce}, got ${parsedResponse.nonce}`);
+        throw new Error("Response failed verification. Rejecting untrusted response.");
+      }
+      // remove this so we don't have to deal with it on the UI side
+      delete parsedResponse.nonce;
+
 
       // Validate the structure meets our requirements
       if (!parsedResponse.destination || !Array.isArray(parsedResponse.days)) {
