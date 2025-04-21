@@ -97,6 +97,9 @@ const MapIntegration: React.FC<MapIntegrationProps> = ({
       ? "rgba(50, 50, 50, 0.2)"
       : theme.palette.background.paper;
 
+  // Constants for API configuration
+  const API_BASE_URL = "http://localhost:3001"; // Backend API URL
+
   // Update currentDay when selectedDay prop changes
   useEffect(() => {
     setCurrentDay(selectedDay);
@@ -161,7 +164,7 @@ const MapIntegration: React.FC<MapIntegrationProps> = ({
     if (itineraryDays.length === 0) return;
 
     if (currentDay >= itineraryDays.length) {
-      setCurrentDay(0); // Show all days
+      setCurrentDay(0); // all days
     } else {
       setCurrentDay(currentDay + 1 > itineraryDays.length ? 0 : currentDay + 1);
     }
@@ -173,7 +176,6 @@ const MapIntegration: React.FC<MapIntegrationProps> = ({
     if (itineraryDays.length === 0) return [];
 
     if (currentDay === 0) {
-      // Show all days - flatten the locations array
       return itineraryDays.flatMap((day) => day.locations || []);
     } else {
       // Show specific day (1-based index)
@@ -182,7 +184,6 @@ const MapIntegration: React.FC<MapIntegrationProps> = ({
     }
   };
 
-  // Update zoom when location changes
   useEffect(() => {
     if (location) {
       setZoom(getZoomLevelForLocation(location));
@@ -190,7 +191,6 @@ const MapIntegration: React.FC<MapIntegrationProps> = ({
     }
   }, [location]);
 
-  // Get category icon for location
   const getLocationIcon = (category?: string) => {
     if (!category) return <ExploreIcon fontSize="small" color="action" />;
 
@@ -233,52 +233,12 @@ const MapIntegration: React.FC<MapIntegrationProps> = ({
     }
   };
 
-  // Handle highlighting a specific location
-  const handleHighlightLocation = (
-    locationName: string,
-    locationAddress: string
-  ) => {
-    const locationString = `${locationName} ${locationAddress}`.trim();
-    setHighlightedLocation(locationString);
-
-    // Update map to focus on this location
-    const apiKey = process.env.REACT_APP_GOOGLE_MAPS_API_KEY;
-    if (!apiKey) return;
-
-    const newMapUrl = `https://www.google.com/maps/embed/v1/place?key=${apiKey}&q=${encodeURIComponent(
-      locationString
-    )}&zoom=${zoom + 1}`;
-    setMapUrl(newMapUrl);
-    setTimestamp(Date.now());
-  };
-
-  // Reset to show all locations for current day
-  const handleResetHighlight = () => {
-    setHighlightedLocation(null);
-    setTimestamp(Date.now()); // Force refresh map with all pins
-  };
-
-  // Update the map URL when location, zoom, or itinerary selection changes
   useEffect(() => {
-    const apiKey = process.env.REACT_APP_GOOGLE_MAPS_API_KEY;
-
-    // Debug log for location changes
     console.log("Location changed in MapIntegration:", location);
-
-    if (!apiKey) {
-      console.error(
-        "Google Maps API key is missing. Please check your .env file."
-      );
-      return;
-    }
 
     const locations = getCurrentLocations();
 
     if (locations.length > 0) {
-      // Use the search mode with multiple locations to show pins
-      // We can add up to 10 locations in the q parameter separated by pipe characters
-      // Format: q=location1|location2|location3
-
       // Prepare location strings, limit to 10 locations
       const locationStrings = locations
         .slice(0, 10)
@@ -293,31 +253,70 @@ const MapIntegration: React.FC<MapIntegrationProps> = ({
         locationStrings.push(location);
       }
 
-      // Build the search query
       const searchQuery = locationStrings.join("|");
-      const newMapUrl = `https://www.google.com/maps/embed/v1/search?key=${apiKey}&q=${encodeURIComponent(
-        searchQuery
-      )}&zoom=${zoom}`;
 
-      console.log("Setting map with itinerary pins:", locations.length);
-      setMapUrl(newMapUrl);
-      setTimestamp(Date.now());
+      fetch(
+        `${API_BASE_URL}/maps/embed?q=${encodeURIComponent(
+          searchQuery
+        )}&zoom=${zoom}`
+      )
+        .then((response) => response.json())
+        .then((data) => {
+          console.log("Setting map with itinerary pins:", locations.length);
+          setMapUrl(data.mapUrl);
+          setTimestamp(Date.now());
+        })
+        .catch((error) => {
+          console.error("Error fetching map data:", error);
+        });
     } else if (location) {
-      // Use the place mode with the location as the query parameter
-      const encodedLocation = encodeURIComponent(location);
-      const newMapUrl = `https://www.google.com/maps/embed/v1/place?key=${apiKey}&q=${encodedLocation}&zoom=${zoom}`;
-      console.log("Setting new map URL for:", location);
-
-      // Set mapUrl and update timestamp to force rerender
-      setMapUrl(newMapUrl);
-      setTimestamp(Date.now());
+      // Use the backend proxy for place mode with single location
+      fetch(
+        `${API_BASE_URL}/maps/embed?q=${encodeURIComponent(
+          location
+        )}&zoom=${zoom}`
+      )
+        .then((response) => response.json())
+        .then((data) => {
+          console.log("Setting new map URL for:", location);
+          setMapUrl(data.mapUrl);
+          setTimestamp(Date.now());
+        })
+        .catch((error) => {
+          console.error("Error fetching map data:", error);
+        });
     } else {
-      // Default to Tokyo with a city-level zoom
-      const defaultUrl = `https://www.google.com/maps/embed/v1/place?key=${apiKey}&q=Tokyo,Japan&zoom=${zoom}`;
-      console.log("Setting default map URL (Tokyo)");
-      setMapUrl(defaultUrl);
+      setMapUrl("");
+      setTimestamp(Date.now());
     }
   }, [location, zoom, currentDay, itineraryDays]);
+
+  const handleHighlightLocation = (
+    locationName: string,
+    locationAddress: string
+  ) => {
+    const locationString = `${locationName} ${locationAddress}`.trim();
+    setHighlightedLocation(locationString);
+
+    fetch(
+      `${API_BASE_URL}/maps/embed?q=${encodeURIComponent(
+        locationString
+      )}&zoom=${zoom + 1}`
+    )
+      .then((response) => response.json())
+      .then((data) => {
+        setMapUrl(data.mapUrl);
+        setTimestamp(Date.now());
+      })
+      .catch((error) => {
+        console.error("Error fetching map data:", error);
+      });
+  };
+
+  const handleResetHighlight = () => {
+    setHighlightedLocation(null);
+    setTimestamp(Date.now()); // Force refresh map with all pins
+  };
 
   return (
     <Paper

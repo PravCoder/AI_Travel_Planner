@@ -7,6 +7,7 @@ dotenv.config(); // Load environment variables
 // Import routers
 import tripRouter from './routes/trip_routes';
 import userRouter from './routes/user_routes';
+import mapsRouter from './routes/maps_routes';
 
 const app = express(); // Create Express app
 app.use(express.json({ strict: false }));
@@ -15,6 +16,7 @@ app.use(cors()); // Enable CORS
 // Mount routers
 app.use('/user', userRouter);
 app.use('/trip', tripRouter);
+app.use('/maps', mapsRouter);
 
 // Connect to MongoDB and make sure server is running on port 3001
 mongoose
