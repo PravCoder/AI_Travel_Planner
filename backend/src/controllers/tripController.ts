@@ -259,7 +259,7 @@ export const getTripsForUser = async (req: Request, res: Response): Promise<void
 };
 
 /**
- * Get a trip by its ID
+ * Get a tri-objp by its ID
  */
 export const getTripById = async (req: Request, res: Response): Promise<void> => {
   try {
