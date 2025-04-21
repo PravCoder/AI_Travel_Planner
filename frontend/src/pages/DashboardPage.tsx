@@ -62,7 +62,7 @@ export default function Dashboard() {
           `http://localhost:3001/trip/get-trips/${userID}`
         );
 
-        // Transform API data to match Trip interface
+         // Transform API data to match Trip interface
         const apiTrips = response.data.map((trip: any) => ({
           id: trip._id,
           title: trip.title || "Untitled Trip",
@@ -74,7 +74,8 @@ export default function Dashboard() {
             "https://images.pexels.com/photos/2325446/pexels-photo-2325446.jpeg",
           isFavorite: trip.isFavorite || false,
         }));
-
+        
+        console.log("dashboard trips: ", response.data);
         setTrips(apiTrips);
 
         setLoading(false);
