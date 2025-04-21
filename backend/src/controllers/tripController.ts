@@ -125,6 +125,7 @@ Postman data:
 export const createEmptyTrip = async (req: Request, res: Response): Promise<void> => {
   try {
       const { userID } = req.body; // when this request is sent make sure to send user-id with it
+      console.log("create empty trip userID: " + userID);
       const new_trip = new TripModel({title:"Untitled Trip", startDate:null, endDate:null, numTravelers:null, budget:null, currentCost:null,country:null, city:null,destinations:null,address:null, location: { type: "Point", coordinates: [0, 0]} }); // 0,0 coordinates for now
       const saved_new_trip = await new_trip.save();
 
@@ -249,9 +250,14 @@ export const getTripsForUser = async (req: Request, res: Response): Promise<void
     const { userID } = req.params;
     
     // Find all trips for the user
-    const trips = await TripModel.find({ userId: userID });
+    const user = await UserModel.findById(userID).populate("trips");
     
-    res.status(200).json(trips);
+    if (user != null) {
+      console.log("trips for user "+ userID +": " + user.trips.length);
+
+      res.status(200).json(user.trips);
+    }
+  
   } catch (error) {
     console.error("Error fetching trips for user:", error);
     res.status(500).json({ error: "Failed to fetch trips for user" });
@@ -259,7 +265,7 @@ export const getTripsForUser = async (req: Request, res: Response): Promise<void
 };
 
 /**
- * Get a trip by its ID
+ * Get a tri-objp by its ID
  */
 export const getTripById = async (req: Request, res: Response): Promise<void> => {
   try {

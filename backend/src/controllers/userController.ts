@@ -65,7 +65,7 @@ export const loginController = async (req: Request<{}, {}, loginBody>, res: Resp
       // if email does exist password matches
       else if (passwords_match == true) {
         const token = jwt.sign({ email }, secretKey, { expiresIn: '1h' });
-        res.json({ token, message:"user successfully logged in", redirect_now: true });
+        res.json({ token, message:"user successfully logged in", redirect_now: true, userID: user._id });
       }
 
     }

@@ -31,7 +31,7 @@ const LoginPage: React.FC = () => {
   useEffect(() => {
     const token = TokenHelper.getToken();
     if (token && !TokenHelper.isTokenExpired(token)) {
-      navigate("/dashboard");
+      // navigate("/dashboard");   //  temporailty commented this because everytime I visited login it kept redirecting to /dashboard
     }
   }, [navigate]);
 
@@ -88,11 +88,15 @@ const LoginPage: React.FC = () => {
       const token = response.data.token;
       TokenHelper.setToken(token);
       navigate("/dashboard");
-      /* if (response.data.redirect_now) {
+
+      // Store userID in local storage for cookie-auth
+      window.localStorage.setItem("userID", response.data.userID);
+      if (response.data.redirect_now) {
         // Store the token in localStorage or a secure cookie
         localStorage.setItem("userID", response.data.userID);
-        navigate("/dashboard"); // Redirect to dashboard after successful login
-      } */
+      } 
+      // Store userID in local storage for cookie-auth
+
     } catch (error) {
       if (axios.isAxiosError(error) && error.response) {
         setServerError(error.response.data.message || "Login failed");
