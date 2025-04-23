@@ -1,5 +1,17 @@
 import { Request, Response, NextFunction } from 'express';
 
+// Extend Express Request interface to include user property
+declare global {
+  namespace Express {
+    interface Request {
+      user?: {
+        id: string;
+        [key: string]: any;
+      };
+    }
+  }
+}
+
 interface RateLimitData {
   count: number;
   resetTime: number;
