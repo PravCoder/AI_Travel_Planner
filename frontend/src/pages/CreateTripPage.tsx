@@ -547,6 +547,24 @@ const CreateTripPage: React.FC = () => {
           <MapIntegration
             location={tripParameters.location || ""}
             onLocationSelect={(loc) => handleParameterChange({ location: loc })}
+            itineraryDays={
+              tripPlan?.days
+                ? tripPlan.days.map((day) => ({
+                    date: day.date,
+                    locations: day.activities.map((activity) => ({
+                      name: activity.name,
+                      location:
+                        activity.location ||
+                        tripPlan.destination ||
+                        tripParameters.location ||
+                        "",
+                      description: activity.description,
+                      time: activity.time,
+                      category: activity.category,
+                    })),
+                  }))
+                : []
+            }
           />
         </Grid>
       </Grid>
