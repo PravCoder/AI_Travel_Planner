@@ -91,6 +91,7 @@ const LoginPage: React.FC = () => {
 
       // Store userID in local storage for cookie-auth
       window.localStorage.setItem("userID", response.data.userID);
+      console.log("setting userID in local storage: ", response.data.userID);
       if (response.data.redirect_now) {
         // Store the token in localStorage or a secure cookie
         localStorage.setItem("userID", response.data.userID);

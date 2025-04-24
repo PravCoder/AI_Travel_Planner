@@ -49,17 +49,22 @@ export const loginController = async (req: Request<{}, {}, loginBody>, res: Resp
   try {
 
     const {email, password} = req.body;
-    console.log("email: " + email + " password: " + password);
+    console.log("given-email: " + email + " given-password: " + password);
 
+    // make sure we select password when fetching user-obj becuse its model definition select=false means password is not selected by default
+    const user = await UserModel.findOne({ email }).select('+password'); 
 
-    const user = await UserModel.findOne({ email });
     // email doesnt exist
     if (!user) {
+      console.log("login failed email no exist");
       res.status(400).json({ error: "user with email not found", message: "User with that email doesnt exist"});
     } else {
+      console.log("actual-email: " + user.email + " actual-password: " + user.password);
       const passwords_match = await verifyPassword(password, user.password);
+
       // email does exist passwords dont match
       if (passwords_match == false) {
+        console.log("login failed passwords no exist");
         res.status(400).json({ error: "user with email found but incorrect password", message: "User with email found but incorrect password"});
       }
       // if email does exist password matches
@@ -71,6 +76,7 @@ export const loginController = async (req: Request<{}, {}, loginBody>, res: Resp
     }
 
   } catch (error) {
+    console.log("error logging in user: ", error);
     res.status(500).json({ error: "Error logining user" });
   }
 }
