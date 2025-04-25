@@ -223,10 +223,11 @@ const CreateTripPage: React.FC = () => {
         (msg) => msg.content
       );
 
-      // Call the backend to generate trip plan
+      // Call the backend to generate trip plan -IMPORTANT
       const response = await axios.post(`${API_BASE_URL}/trip/generate`, {
         tripParameters,
         conversationContext,
+        tripID
       });
 
       // Process the trip plan response
@@ -308,7 +309,7 @@ const CreateTripPage: React.FC = () => {
         return;
       }
 
-      // Regular chat flow
+      // Regular chat flow -IMPORTANT
       const response = await axios.post(`${API_BASE_URL}/trip/chat`, {
         message: messageText,
         tripParameters,
@@ -324,7 +325,7 @@ const CreateTripPage: React.FC = () => {
         commandDetected &&
         (tripParameters.location || tripParameters.tripType)
       ) {
-        // AI detected a plan generation command and we have minimum requirements
+        // AI detected a plan generation command and we have minimum requirements - IMPORTANT
         await generateTripPlan();
       } else {
         // Add AI response message

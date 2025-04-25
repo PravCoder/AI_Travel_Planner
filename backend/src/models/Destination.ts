@@ -45,3 +45,4 @@ const DestinationsSchema: Schema<IDestinations> = new Schema(
 const DestinationModel: Model<IDestinations> = mongoose.model<IDestinations>("Destination", DestinationsSchema);
 
 export default DestinationModel;
+export type { IDestinations };

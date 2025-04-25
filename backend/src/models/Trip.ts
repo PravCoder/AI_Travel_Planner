@@ -35,7 +35,7 @@ const TripSchema: Schema<ITrip> = new Schema({
   currentCost: { type: Number, required: false, unique: false },
   country: { type: String, required: false, unique: false },
   city: { type: String, required: false, unique: false },
-  destinations: [{ type: Schema.Types.ObjectId, ref: 'Destination' }],
+  destinations: [{ type: Schema.Types.ObjectId, ref: 'Destination', default: [] }], // default is empty array not null
   address: { type: String, required: false, unique: false },
   location: {
     type: {

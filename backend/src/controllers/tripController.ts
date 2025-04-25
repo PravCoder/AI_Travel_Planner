@@ -4,7 +4,10 @@ import { TripParameters } from '../models/Trip';
 import TripModel from '../models/Trip';
 import UserModel from '../models/User';
 import DestinationModel from '../models/Destination';
+import {IDestinations} from '../models/Destination';
 import { groupTripByDays } from '../Functions/TripFunctions';
+import mongoose, { Types } from 'mongoose';
+
 
 /**
  * Handle chat messages for the trip planning conversation
@@ -70,14 +73,15 @@ export const chatWithTripPlanner = async (req: Request, res: Response): Promise<
 };
 
 /**
- * Generate a structured trip plan
+ * Generate a structured trip plan, the initial draft
  */
 export const generateTripPlan = async (req: Request, res: Response): Promise<void> => {
   try {
-    const { tripParameters, conversationContext } = req.body;
-    
     // TODO: Once authentication is implemented, get userId from req.user.id
     // const userId = req.user?.id;
+
+    const { tripParameters, conversationContext, tripID } = req.body;
+
     
     if (!tripParameters || !tripParameters.location) {
       res.status(400).json({ error: 'Trip parameters with location are required' });
@@ -85,24 +89,91 @@ export const generateTripPlan = async (req: Request, res: Response): Promise<voi
     }
 
     console.log("Trip parameters exist (past 400 error check)");
+
+    // get the trip-obj that we are generating trip-data for
+    const trip = await TripModel.findById(tripID);
     
-    // Generate trip plan with OpenAI
+    // generate trip plan with OpenAI
     const tripPlanData = await generateStructuredTripPlan(
       tripParameters,
       conversationContext
     );
+
+    // just create a variable to print activites across all days from generated trip plan to comapre with the saved trip object
+    const all_activities: any[] = [];
+
+    // breakdown generated-trip data format into its attributes for ease of acess
+    const {destination, title, startDate, endDate, days, budget, travelers } = tripPlanData;
+
+    // iterate all days of generated-trip
+    for (const day of days) {
+      const dayDate = new Date(day.date);
+  
+      // iterate all activities for cur-day
+      for (const activity of day.activities) {
+        all_activities.push(activity);
+        // breakdown cur-activity into its attributes for ease of access
+        const { name: act_name, description: act_description, location: act_location, category: act_category, price: act_price, time: act_time, tags: act_tags } = activity;
+        console.log("---processing an activity---:")
+        console.log("act_name: ", act_name);
+        console.log("act_description: ", act_description);
+        console.log("act_location: ", act_location);
+        console.log("act_category: ", act_category);
+        console.log("act_price: ", act_price);
+        console.log("act_time: ", act_time);
+        console.log("act_tags: ", act_tags);
+        // parse the timings and cost for cur-activity
+        const timeToUse = act_time.toLowerCase() === 'anytime' ? '09:00' : act_time;
+        const act_startTime = new Date(`${day.date} ${timeToUse}`);
+        let act_endTime: Date;
+        if (act_time.toLowerCase() === 'anytime' || isNaN(act_startTime.getTime())) {
+          act_endTime = new Date(act_startTime.getTime() + 60 * 60 * 1000); // 1 hour duration
+        } else {
+          act_endTime = new Date(act_startTime.getTime() + 60 * 60 * 1000); // Default 1 hour after start time
+        }
+        const act_costNum = act_price.toLowerCase() === 'free' ? 0 : act_price.toLowerCase() === 'varies' ? 0 : Number(act_price.replace(/[^0-9.-]+/g, '')) || 0;
+        
+        // create new destination-obj for cur-activity in cur-day
+        const new_destination = new DestinationModel({
+          title: act_name,
+          city: destination,  // set city of activity equal to destination of trip for now
+          location: {
+            type: 'Point',
+            coordinates: [0, 0],
+          },
+          startTime: act_startTime,
+          endTime: act_endTime,
+
+          transportationMode: "Car",   // we havent handled transportation yet
+          activityType: act_category,
+
+          address: act_location,
+          cost: act_costNum
+        });
+        // save this newly created destination obj for cur-act for cur-day
+        // console.log("is trip null: ", trip);
+        if (trip) {
+          const savedNewDestination = await new_destination.save() as IDestinations & { _id: mongoose.Schema.Types.ObjectId };
+          trip.destinations.push(savedNewDestination._id);
+          await trip.save();
+        }
+      
+      }
+    }
+
+
+
+
     
-    // TODO: Once authentication is implemented, save the trip to the database for logged-in users
-    // if (userId) {
-    //   const trip = new TripModel({
-    //     userId: userId,
-    //     ...tripPlanData
-    //   });
-    //   await trip.save();
-    // }
-    
-    // For now, just return the generated trip plan without saving to DB
+    // for now, just return the generated trip plan.
+    console.log("-----Generated Trip Plan Data:-----");
+    console.log(tripPlanData);
+    console.log("Activities----: ");
+    console.log(all_activities);
     res.json(tripPlanData);
+
+    console.log("\n-----Trip Object After Saving Generated Trip Data To It:-----");
+    console.log(trip);
     
   } catch (error: any) {
     console.error('Error generating trip plan:', error);
@@ -126,7 +197,8 @@ export const createEmptyTrip = async (req: Request, res: Response): Promise<void
   try {
       const { userID } = req.body; // when this request is sent make sure to send user-id with it
       console.log("create empty trip userID: " + userID);
-      const new_trip = new TripModel({title:"Untitled Trip", startDate:null, endDate:null, numTravelers:null, budget:null, currentCost:null,country:null, city:null,destinations:null,address:null, location: { type: "Point", coordinates: [0, 0]} }); // 0,0 coordinates for now
+      // set destinations equal to empty array not null
+      const new_trip = new TripModel({title:"Untitled Trip", startDate:null, endDate:null, numTravelers:null, budget:null, currentCost:null,country:null, city:null,destinations:[],address:null, location: { type: "Point", coordinates: [0, 0]} }); // 0,0 coordinates for now
       const saved_new_trip = await new_trip.save();
 
       const user = await UserModel.findById(userID); // get the current logged in user (via cookies)
