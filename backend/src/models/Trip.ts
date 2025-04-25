@@ -67,3 +67,4 @@ TripSchema.index({ location: '2dsphere' });
 const TripModel: Model<ITrip> = mongoose.model<ITrip>('Trip', TripSchema);
 
 export default TripModel;
+export type { ITrip };

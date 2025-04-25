@@ -3,6 +3,7 @@ import mongoose, {Schema, Document, Model} from 'mongoose';
 //Define interface for destinations model
 interface IDestinations extends Document {
     title: string; 
+    notes: string; 
     city: string;
     location: {
         type: string;
@@ -20,6 +21,7 @@ interface IDestinations extends Document {
 const DestinationsSchema: Schema<IDestinations> = new Schema(
     {
       title: {type: String, required: true},
+      notes: {type: String, required: false},
       city: {type: String, required: true},
       location: {
         type: {

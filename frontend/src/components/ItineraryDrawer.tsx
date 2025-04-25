@@ -92,9 +92,16 @@ const ItineraryDrawer: React.FC<ItineraryDrawerProps> = ({
   const [drawerSide, setDrawerSide] = useState<"left" | "right">("right");
   const [expandedDays, setExpandedDays] = useState<Record<number, boolean>>({});
 
+
+
   // Map OpenAI category to our icons
   const mapCategoryToIcon = (category: string): ActivityCategory => {
-    const lowerCategory = category.toLowerCase();
+    var lowerCategory;
+    if (category) {
+      lowerCategory = category.toLowerCase();
+    } else {
+      lowerCategory = "food";
+    }
     if (
       lowerCategory.includes("food") ||
       lowerCategory.includes("restaurant") ||
@@ -293,6 +300,7 @@ const ItineraryDrawer: React.FC<ItineraryDrawerProps> = ({
   */
 
   // Convert tripPlan to itineraryDays format
+  console.log("tripPlan in ItinDrawer: ", tripPlan);
   const itineraryDays = tripPlan?.days?.map((day, index) => {
     // Extract location from first activity, or use destination
     const location = day.activities[0]?.location || tripPlan.destination;

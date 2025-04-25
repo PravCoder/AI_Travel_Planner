@@ -136,6 +136,7 @@ export const generateTripPlan = async (req: Request, res: Response): Promise<voi
         // create new destination-obj for cur-activity in cur-day
         const new_destination = new DestinationModel({
           title: act_name,
+          notes: act_description,
           city: destination,  // set city of activity equal to destination of trip for now
           location: {
             type: 'Point',
@@ -295,11 +296,16 @@ export const testCreateCompleteTrip = async (req: Request, res: Response): Promi
 
 /* 
 This route is to test if a trip can be converted into a days grouping to be displayed into the createTripPage. 
-POSTMAN URL: http://localhost:3001/trip/test-get-days-from-trip
+POSTMAN URL: http://localhost:3001/trip/get-days-from-trip
+{
+    "trip_id":"680b0649e3f57ce79cfd98c4"
+}
 */
-export const testGetDaysFromTrip = async (req: Request, res: Response): Promise<void> => {
+export const getDaysFromTrip = async (req: Request, res: Response): Promise<void> => {
   try {
-    var trip_id = "67e9bdea6aed90e485048b4d"; // change this to test different trips grouping into days
+    const { trip_id } = req.params;
+    console.log("getDaysFromTrip trip_id: ",trip_id );
+    
     var days_of_trip = await groupTripByDays(trip_id); // <-- Await the async function
     if (!days_of_trip) {
       res.status(404).json({ message: "Trip not found or has no destinations" });

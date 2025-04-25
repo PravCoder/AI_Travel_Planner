@@ -49,7 +49,7 @@ const CreateTripPage: React.FC = () => {
 
         console.log("Fetching trip data for ID:", tripID);
         const response = await axios.get(
-          `${API_BASE_URL}/trip/get-trip/${tripID}`
+          `${API_BASE_URL}/trip/get-days-from-trip/${tripID}`
         );
         const tripData = response.data;
 
@@ -69,6 +69,7 @@ const CreateTripPage: React.FC = () => {
         if (tripData.destination && tripData.days) {
           setTripPlan(tripData);
         }
+        setTripPlan(tripData);
       } catch (error) {
         console.error("Error loading trip data:", error);
       }

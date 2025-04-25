@@ -5,7 +5,7 @@ import {
   updateTrip,
   createEmptyTrip, 
   testCreateCompleteTrip,
-  testGetDaysFromTrip,
+  getDaysFromTrip,
   getTripsForUser,
   getTripById
 } from '../controllers/tripController';
@@ -26,10 +26,11 @@ router.post('/update-trip', updateTrip);
 // Get user trips routes
 router.get('/get-trips/:userID', getTripsForUser);
 router.get('/get-trip/:tripID', getTripById);
+router.get('/get-days-from-trip/:trip_id', getDaysFromTrip);
+
 
 // TESTING ROUTES BELOW::
 router.post('/test-create-complete-trip', testCreateCompleteTrip);
-router.post('/test-get-days-from-trip', testGetDaysFromTrip);
 
 // TODO: Once authentication is implemented, add user-specific trip routes here
 
