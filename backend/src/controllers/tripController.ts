@@ -14,11 +14,21 @@ import mongoose, { Types } from 'mongoose';
  */
 export const chatWithTripPlanner = async (req: Request, res: Response): Promise<void> => {
   try {
-    const { message, tripParameters, chatHistory } = req.body;
+    const { message, tripParameters, chatHistory, isTestRequest } = req.body;
     
     if (!message) {
       console.log('No message provided in request');
       res.status(400).json({ error: 'Message is required' });
+      return;
+    }
+    
+    // Check if this is a test request - if so, return a minimal response to save API costs
+    if (isTestRequest) {
+      console.log('Test request received - returning minimal response');
+      res.json({
+        reply: "Test response",
+        commandDetected: false
+      });
       return;
     }
     
