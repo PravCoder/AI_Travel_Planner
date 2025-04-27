@@ -399,6 +399,8 @@ const CreateTripPage: React.FC = () => {
     setDrawerSide(side);
   };
 
+  console.log("tripPlan passed to ItineraryDrawer: \n", tripPlan);
+
   return (
     <Box
       sx={{

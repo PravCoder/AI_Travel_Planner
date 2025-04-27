@@ -322,6 +322,7 @@ const ItineraryDrawer: React.FC<ItineraryDrawerProps> = ({
       weatherForecast: "Weather information currently not available",
     };
   });
+  console.log("itineraryDays format: ", itineraryDays);
 
   return (
     <Drawer
