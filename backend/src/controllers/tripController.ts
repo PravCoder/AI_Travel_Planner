@@ -172,9 +172,6 @@ export const generateTripPlan = async (req: Request, res: Response): Promise<voi
       }
     }
 
-
-
-
     
     // for now, just return the generated trip plan.
     console.log("-----Generated Trip Plan Data:-----");
