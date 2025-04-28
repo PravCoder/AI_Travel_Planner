@@ -262,7 +262,7 @@ const CreateTripPage: React.FC = () => {
     } catch (error) {
       console.error("Error generating trip plan:", error);
 
-      // Add error message
+      // Add error message - DEMO
       const errorMessage: ChatMessageType = {
         id: uuidv4(),
         text: "Sorry, I encountered an error generating your trip plan. Please try again.",

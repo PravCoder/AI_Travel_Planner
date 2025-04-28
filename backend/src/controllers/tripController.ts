@@ -87,7 +87,7 @@ export const chatWithTripPlanner = async (req: Request, res: Response): Promise<
 /**
  * Generate a structured trip plan, the initial draft
  */
-export const generateTripPlan = async (req: Request, res: Response): Promise<void> => {
+export const generateTripPlan = async (req: Request, res: Response): Promise<void> => { // - DEMO
   try {
     // TODO: Once authentication is implemented, get userId from req.user.id
     // const userId = req.user?.id;

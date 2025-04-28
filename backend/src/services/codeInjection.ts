@@ -8,7 +8,7 @@ console.log(isCodeInjection("HelloWorld123"));     // false
 console.log(isCodeInjection("<script>alert(1)</script>")); // true
 console.log(isCodeInjection("normalUsername_123")); // false
 */
-export function isCodeInjection(input) {
+export function isCodeInjection(input) { // - DEMO
     if (typeof input !== 'string') return false;
   
     // Patterns that look suspicious
