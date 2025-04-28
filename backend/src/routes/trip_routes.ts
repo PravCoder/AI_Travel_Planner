@@ -7,7 +7,8 @@ import {
   testCreateCompleteTrip,
   getDaysFromTrip,
   getTripsForUser,
-  getTripById
+  getTripById, 
+  downloadTripPDF
 } from '../controllers/tripController';
 import { rateLimitMiddleware, resetRateLimits } from '../services/rateLimitService';
 
@@ -34,6 +35,9 @@ router.post('/update-trip', updateTrip);
 router.get('/get-trips/:userID', getTripsForUser);
 router.get('/get-trip/:tripID', getTripById);
 router.get('/get-days-from-trip/:trip_id', getDaysFromTrip);
+
+router.post('/download-trip', downloadTripPDF);
+
 
 
 // TESTING ROUTES BELOW::

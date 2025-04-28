@@ -7,6 +7,8 @@ import DestinationModel from '../models/Destination';
 import {IDestinations} from '../models/Destination';
 import { groupTripByDays } from '../Functions/TripFunctions';
 import mongoose, { Types } from 'mongoose';
+import { jsPDF } from 'jspdf';
+
 
 
 /**
@@ -237,6 +239,21 @@ export const updateTrip = async (req: Request, res: Response): Promise<void> => 
 };
 
 
+
+/* 
+This rooute downloads a trip as a PDF, not working because its needs to return 
+*/
+export const downloadTripPDF = async (req: Request, res: Response): Promise<void> => {
+  try {
+    // Your code logic here
+  } catch (error) {
+    // Error handling here
+  }
+};
+
+
+
+
 // -----TESTING ROUTES BELOW-----:
 
 /* 
@@ -302,6 +319,7 @@ export const testCreateCompleteTrip = async (req: Request, res: Response): Promi
 
 
 /* 
+This function is not in use, its replacement is in TripFunctions.ts
 This route is to test if a trip can be converted into a days grouping to be displayed into the createTripPage. 
 POSTMAN URL: http://localhost:3001/trip/get-days-from-trip
 {

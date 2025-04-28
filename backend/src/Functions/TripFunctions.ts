@@ -89,3 +89,18 @@ export async function groupTripByDays(trip_id: string) {
     return;
   }
 }
+
+
+export async function canDownloadTripPDF(trip: any) {
+  // TBD
+  if (!trip || !trip.trip_id || !trip.trip_name || !trip.start_date || !trip.end_date) {
+    return false; // Return false if the trip is missing essential properties
+  }
+
+  // Check if the destinations array exists and has at least one destination
+  if (!trip.destinations || trip.destinations.length === 0) {
+    return false; // Return false if there are no destinations
+  }
+
+  return true;
+}

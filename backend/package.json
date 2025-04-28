@@ -20,6 +20,7 @@
     "google-auth-library": "^9.15.1",
     "ioredis": "^5.3.2",
     "jsonwebtoken": "^9.0.2",
+    "jspdf": "^3.0.1",
     "mongoose": "^8.9.5",
     "nodemon": "^3.1.9",
     "openai": "^4.87.3",
