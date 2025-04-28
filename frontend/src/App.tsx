@@ -24,18 +24,43 @@ function App() {
             <Route path="/register" element={<RegisterPage />} />
 
             {/* Protected Routes */}
-            <Route path="/" element={<DashboardLayout />}>
-              <Route index element={<DashboardPage />} />
+            <Route
+              path="/"
+              element={
+                <ProtectedRoute>
+                  <DashboardLayout />
+                </ProtectedRoute>
+              }
+            >
+              <Route
+                index
+                element={
+                  <ProtectedRoute>
+                    <DashboardPage />
+                  </ProtectedRoute>
+                }
+              />
               <Route path="dashboard" element={<DashboardPage />} />
 
               {/* dynamic url for trip-id */}
               <Route path="create-trip/:tripID" element={<CreateTripPage />} />
 
-              <Route path="about" element={<AboutPage />} />
+              <Route
+                path="about"
+                element={
+                  <ProtectedRoute>
+                    <AboutPage />
+                  </ProtectedRoute>
+                }
+              />
 
               <Route
                 path="popular-destinations"
-                element={<PopularDestinationsPage />}
+                element={
+                  <ProtectedRoute>
+                    <PopularDestinationsPage />
+                  </ProtectedRoute>
+                }
               />
             </Route>
           </Routes>
