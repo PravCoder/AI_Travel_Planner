@@ -29,6 +29,7 @@ import ExpandLessIcon from "@mui/icons-material/ExpandLess";
 import DirectionsCarIcon from "@mui/icons-material/DirectionsCar";
 import ExploreIcon from "@mui/icons-material/Explore";
 import { TripParametersData } from "./TripParameters";
+import PDFService from "../services/PDFService"; 
 
 // Add interface for the trip plan data matching the OpenAI response
 interface TripPlanActivity {
@@ -92,7 +93,34 @@ const ItineraryDrawer: React.FC<ItineraryDrawerProps> = ({
   const [drawerSide, setDrawerSide] = useState<"left" | "right">("right");
   const [expandedDays, setExpandedDays] = useState<Record<number, boolean>>({});
 
-
+  // Handle PDF download
+  const handleDownloadPDF = () => {
+    if (tripPlan) {
+      PDFService.downloadPDF(tripPlan);
+    } else if (tripParameters.location) {
+      // Create a minimal trip plan if no complete plan exists
+      const minimalPlan: TripPlan = {
+        destination: tripParameters.location,
+        title: `Trip to ${tripParameters.location}`,
+        startDate: tripParameters.startDate ? tripParameters.startDate.toLocaleDateString("en-US", {
+          year: "numeric",
+          month: "long",
+          day: "numeric",
+        }) : null,
+        endDate: tripParameters.endDate ? tripParameters.endDate.toLocaleDateString("en-US", {
+          year: "numeric",
+          month: "long",
+          day: "numeric",
+        }) : null,
+        days: [],
+        budget: tripParameters.budget,
+        travelers: tripParameters.travelers,
+        summary: `Trip plan for visiting ${tripParameters.location}. This is a draft itinerary that will be filled with activities and details once your trip is fully planned.`,
+        tags: [tripParameters.location, tripParameters.budget]
+      };
+      PDFService.downloadPDF(minimalPlan);
+    }
+  };
 
   // Map OpenAI category to our icons
   const mapCategoryToIcon = (category: string): ActivityCategory => {
@@ -322,6 +350,7 @@ const ItineraryDrawer: React.FC<ItineraryDrawerProps> = ({
       weatherForecast: "Weather information currently not available",
     };
   });
+  console.log("itineraryDays format: ", itineraryDays);
 
   return (
     <Drawer
@@ -508,7 +537,7 @@ const ItineraryDrawer: React.FC<ItineraryDrawerProps> = ({
 
         <Box>
           <Tooltip title="Download PDF">
-            <IconButton size="small">
+            <IconButton size="small" onClick={handleDownloadPDF}>
               <DownloadIcon fontSize="small" />
             </IconButton>
           </Tooltip>

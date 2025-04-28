@@ -12,12 +12,11 @@ This is to display the trip by its grouping it into days on the create trip page
 */
 export async function groupTripByDays(trip_id: string) {
   try {
-
-    console.log("groupTripByDays trip_id: ",trip_id );
+    console.log("groupTripByDays trip_id: ", trip_id);
+    
     const trip = await TripModel.findById(trip_id)
-      .populate<{ destinations: IDestinations[] }>("destinations") //  correctly typed population
+      .populate<{ destinations: IDestinations[] }>("destinations")
       .lean();
-
 
     if (!trip) {
       console.log("Trip not found");
@@ -36,21 +35,20 @@ export async function groupTripByDays(trip_id: string) {
       if (!daysMap[day]) {
         daysMap[day] = {
           date: day,
-          hotel: "", // If needed, update logic to fetch hotel per day
+          hotel: "", 
           activities: [],
-          notes: "", // You can enhance this if your data supports it
+          notes: "", 
         };
       }
 
       daysMap[day].activities.push({
-        title: destination.title,
-        address: destination.address,
-        startTime: destination.startTime,
-        endTime: destination.endTime,
-        activityType: destination.activityType,
-        transportationMode: destination.transportationMode,
-        cost: destination.cost,
-        notes: destination.notes || "",
+        name: destination.title,
+        description: destination.notes || "",
+        location: destination.address,
+        category: destination.activityType?.toLowerCase() || "general",
+        price: destination.cost ? `$${destination.cost}` : "Free",
+        time: destination.startTime,
+        tags: [], // Add tags if you have, otherwise keep empty
       });
     });
 
@@ -58,10 +56,8 @@ export async function groupTripByDays(trip_id: string) {
       (a, b) => new Date(a.date).getTime() - new Date(b.date).getTime()
     );
 
-    // Optional: get hotel name from the first destination of each day if applicable
     sortedDays.forEach(day => {
       if (day.activities.length > 0) {
-        // You can adapt this to a smarter hotel extraction later
         day.hotel = trip.address || "Unknown Hotel";
         day.notes = `Day planned with ${day.activities.length} activities.`;
       }
@@ -92,4 +88,19 @@ export async function groupTripByDays(trip_id: string) {
     console.error("Error grouping trip by days:", error);
     return;
   }
+}
+
+
+export async function canDownloadTripPDF(trip: any) {
+  // TBD
+  if (!trip || !trip.trip_id || !trip.trip_name || !trip.start_date || !trip.end_date) {
+    return false; // Return false if the trip is missing essential properties
+  }
+
+  // Check if the destinations array exists and has at least one destination
+  if (!trip.destinations || trip.destinations.length === 0) {
+    return false; // Return false if there are no destinations
+  }
+
+  return true;
 }

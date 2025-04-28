@@ -7,14 +7,22 @@ import {
   testCreateCompleteTrip,
   getDaysFromTrip,
   getTripsForUser,
-  getTripById
+  getTripById, 
+  downloadTripPDF
 } from '../controllers/tripController';
-import { rateLimitMiddleware } from '../services/rateLimitService';
+import { rateLimitMiddleware, resetRateLimits } from '../services/rateLimitService';
 
 const router = express.Router();
 
 // Chat route with rate limiting
 router.post('/chat', rateLimitMiddleware, chatWithTripPlanner);
+
+// Test endpoint to reset rate limits
+router.post('/reset-rate-limits', (req, res) => {
+  console.log('Resetting rate limits for testing');
+  resetRateLimits();
+  res.json({ success: true, message: 'Rate limits reset successfully' });
+});
 
 // Trip generation routes, specifying type of request either post, get, etc
 router.post('/generate', generateTripPlan);
@@ -27,6 +35,9 @@ router.post('/update-trip', updateTrip);
 router.get('/get-trips/:userID', getTripsForUser);
 router.get('/get-trip/:tripID', getTripById);
 router.get('/get-days-from-trip/:trip_id', getDaysFromTrip);
+
+router.post('/download-trip', downloadTripPDF);
+
 
 
 // TESTING ROUTES BELOW::

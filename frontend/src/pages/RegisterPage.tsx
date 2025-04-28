@@ -34,7 +34,7 @@ const RegisterPage: React.FC = () => {
   useEffect(() => {
     const token = TokenHelper.getToken();
     if (token && !TokenHelper.isTokenExpired(token)) {
-      navigate("/dashboard");
+      // navigate("/dashboard");     // disabled redirect for demo
     }
   }, [navigate]);
 

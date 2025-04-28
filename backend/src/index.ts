@@ -9,9 +9,16 @@ import tripRouter from './routes/trip_routes';
 import userRouter from './routes/user_routes';
 import mapsRouter from './routes/maps_routes';
 
+// Import middleware
+import { authMiddleware } from './middleware/authMiddleware';
+
 const app = express(); // Create Express app
 app.use(express.json({ strict: false }));
 app.use(cors()); // Enable CORS
+
+// Apply authentication middleware to all routes
+// This will set req.user when a valid token is provided
+app.use(authMiddleware);
 
 // Mount routers
 app.use('/user', userRouter);

@@ -7,6 +7,8 @@ import DestinationModel from '../models/Destination';
 import {IDestinations} from '../models/Destination';
 import { groupTripByDays } from '../Functions/TripFunctions';
 import mongoose, { Types } from 'mongoose';
+import { jsPDF } from 'jspdf';
+
 
 
 /**
@@ -14,11 +16,21 @@ import mongoose, { Types } from 'mongoose';
  */
 export const chatWithTripPlanner = async (req: Request, res: Response): Promise<void> => {
   try {
-    const { message, tripParameters, chatHistory } = req.body;
+    const { message, tripParameters, chatHistory, isTestRequest } = req.body;
     
     if (!message) {
       console.log('No message provided in request');
       res.status(400).json({ error: 'Message is required' });
+      return;
+    }
+    
+    // Check if this is a test request - if so, return a minimal response to save API costs
+    if (isTestRequest) {
+      console.log('Test request received - returning minimal response');
+      res.json({
+        reply: "Test response",
+        commandDetected: false
+      });
       return;
     }
     
@@ -162,9 +174,6 @@ export const generateTripPlan = async (req: Request, res: Response): Promise<voi
       }
     }
 
-
-
-
     
     // for now, just return the generated trip plan.
     console.log("-----Generated Trip Plan Data:-----");
@@ -228,6 +237,21 @@ export const updateTrip = async (req: Request, res: Response): Promise<void> => 
     res.status(201).json({ message: "error updating trip" });
   }
 };
+
+
+
+/* 
+This rooute downloads a trip as a PDF, not working because its needs to return 
+*/
+export const downloadTripPDF = async (req: Request, res: Response): Promise<void> => {
+  try {
+    // Your code logic here
+  } catch (error) {
+    // Error handling here
+  }
+};
+
+
 
 
 // -----TESTING ROUTES BELOW-----:
@@ -295,6 +319,7 @@ export const testCreateCompleteTrip = async (req: Request, res: Response): Promi
 
 
 /* 
+This function is not in use, its replacement is in TripFunctions.ts
 This route is to test if a trip can be converted into a days grouping to be displayed into the createTripPage. 
 POSTMAN URL: http://localhost:3001/trip/get-days-from-trip
 {

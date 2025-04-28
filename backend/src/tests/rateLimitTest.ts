@@ -2,15 +2,36 @@ import axios from 'axios';
 
 const API_URL = 'http://localhost:3001/trip/chat';
 const SERVER_CHECK_URL = 'http://localhost:3001';
+const RESET_URL = 'http://localhost:3001/trip/reset-rate-limits';
+// Add a TEST_MODE flag to reduce API usage
+const TEST_MODE = true; // Set to true to use minimal content for testing
+// Generate a unique ID for this test run to prevent overlapping with previous tests
+const uniqueTestId = `test-${Date.now()}`;
+
+async function resetRateLimits() {
+  try {
+    console.log('Resetting rate limits before test...');
+    await axios.post(RESET_URL);
+    console.log('Rate limits reset successfully');
+  } catch (error) {
+    console.error('Failed to reset rate limits:', error);
+  }
+}
 
 async function testRateLimit() {
   console.log('Testing rate limiting...');
+  console.log(`Using unique test ID: ${uniqueTestId}`);
   
   // Make requests until we hit the limit
-  for (let i = 1; i <= 12; i++) {
+  for (let i = 1; i <= 52; i++) {
     try {
+      // Use minimal content to reduce OpenAI API costs during testing
       const response = await axios.post(API_URL, {
-        message: `Test message ${i}`
+        message: TEST_MODE ? "test" : `Test message ${i}`, 
+        // Add a test flag to signal this is a test request
+        isTestRequest: TEST_MODE,
+        // Add unique test ID to avoid interference between test runs
+        testId: uniqueTestId
       });
       console.log(`Request ${i}: Success - Status ${response.status}`);
     } catch (error: any) {
@@ -54,6 +75,7 @@ async function checkServer() {
 async function main() {
   const serverRunning = await checkServer();
   if (serverRunning) {
+    await resetRateLimits();
     await testRateLimit();
   }
 }
