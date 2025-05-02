@@ -8,7 +8,7 @@ import {ITrip} from '../models/Trip';
 
 /* 
 Given a trip-object this function should return a list where each element is a day, and each day-element as multiple destinations and all their info. 
-This is to display the trip by its grouping it into days on the create trip page. Not tested yet.
+This is to display the trip by its grouping it into days on the create trip page.
 */
 export async function groupTripByDays(trip_id: string) {
   try {
@@ -47,7 +47,11 @@ export async function groupTripByDays(trip_id: string) {
         location: destination.address,
         category: destination.activityType?.toLowerCase() || "general",
         price: destination.cost ? `$${destination.cost}` : "Free",
-        time: destination.startTime,
+        time: new Date(destination.startTime).toLocaleTimeString("en-US", {  // only show time not full time object for time of each activity
+          hour: "numeric",
+          minute: "2-digit",
+          hour12: true,
+        }),
         tags: [], // Add tags if you have, otherwise keep empty
       });
     });

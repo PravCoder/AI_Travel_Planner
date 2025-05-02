@@ -49,7 +49,7 @@ const CreateTripPage: React.FC = () => {
 
         console.log("Fetching trip data for ID:", tripID);
         const response = await axios.get(
-          `${API_BASE_URL}/trip/get-days-from-trip/${tripID}`
+          `${API_BASE_URL}/trip/get-days-from-trip/${tripID}` // when page is refreshed get the trip-object & the returned data should be the trip-obj converted into days format, which is passed into ItineraryDrawer.tsx
         );
         const tripData = response.data;
 
